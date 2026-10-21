@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Notifikasi - Panduan Memasak</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="navbar">
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('index') }}" style="margin-right: auto; text-decoration: none; color: #333; font-weight: 600;">🏠 Beranda</a>
+            <a href="{{ url_for('notifikasi') }}" style="position: relative; margin-right: 15px; text-decoration: none; font-size: 1.2em;">
+                🔔
+            </a>
+            <span>Halo, <a href="{{ url_for('profil', username=current_user.username) }}">@{{ current_user.username }}</a></span>
+            <form method="POST" action="{{ url_for('logout') }}" style="display:inline;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="tombol-logout">Logout</button>
+            </form>
+        {% else %}
+            <a href="{{ url_for('login') }}">Login</a>
+            <a href="{{ url_for('register') }}">Daftar</a>
+        {% endif %}
+    </div>
+
+    <h1>🔔 Notifikasi</h1>
+
+    <div class="card" style="padding: 0;">
+        {% if notif_list %}
+            <ul style="list-style: none; padding: 0; margin: 0;">
+                {% for n in notif_list %}
+                <li class="notif-item {% if not n['dibaca'] %}notif-unread{% endif %}">
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <div style="font-size: 1.5em;">
+                            {% if n['tipe'] == 'like' %}❤️
+                            {% elif n['tipe'] == 'komentar' %}💬
+                            {% else %}👤{% endif %}
+                        </div>
+                        <div>
+                            <strong>@{{ n['pengirim_username'] }}</strong> {{ n['pesan'] }}<br>
+                            <a href="{{ n['tautan'] }}" style="font-size: 0.9em; color: #d35400; text-decoration: none; font-weight: bold;">Lihat</a>
+                            <span style="font-size: 0.8em; color: #aaa; margin-left: 10px;">{{ n['waktu'] }}</span>
+                        </div>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="kosong" style="padding: 40px 20px;">Belum ada notifikasi.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

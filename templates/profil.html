@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ user_pub.username }} - Profil</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="navbar">
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('index') }}" style="margin-right: auto; text-decoration: none; color: #333; font-weight: 600;">🏠 Beranda</a>
+            <a href="{{ url_for('notifikasi') }}" style="position: relative; margin-right: 15px; text-decoration: none; font-size: 1.2em;">
+                🔔
+            </a>
+            <span>Halo, <a href="{{ url_for('profil', username=current_user.username) }}">@{{ current_user.username }}</a></span>
+            <form method="POST" action="{{ url_for('logout') }}" style="display:inline;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="tombol-logout">Logout</button>
+            </form>
+        {% endif %}
+    </div>
+
+    <a href="{{ url_for('index') }}" class="kembali">← Kembali ke daftar</a>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in messages %}
+        <p class="flash flash-{{ cat }}">{{ msg }}</p>
+      {% endfor %}
+    {% endwith %}
+
+    <div class="card">
+        <div class="profil-header">
+            <div>
+                <h1>@{{ user_pub.username }}</h1>
+                {% if user_pub.bio %}
+                <p>{{ user_pub.bio }}</p>
+                {% else %}
+                <p class="meta">Belum ada bio.</p>
+                {% endif %}
+                <p class="meta">Bergabung sejak {{ user_pub.join_date }}</p>
+            </div>
+
+            {% if current_user.is_authenticated and user_idku != user_id %}
+            <form method="POST" action="{{ url_for('toggle_follow', target_id=user_id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="tombol-follow {% if sudah_follow %}aktif{% endif %}">
+                    {% if sudah_follow %}✓ Mengikuti{% else %}+ Ikuti{% endif %}
+                </button>
+            </form>
+            {% endif %}
+
+            {% if current_user.is_authenticated and user_idku == user_id %}
+            <a href="{{ url_for('pengaturan') }}" class="tombol-edit">⚙️ Edit Profil</a>
+            {% endif %}
+        </div>
+
+        <div class="stats-profil">
+            <div class="stat-item">
+                <strong>{{ total_resep }}</strong>
+                <span>Resep</span>
+            </div>
+            <div class="stat-item">
+                <strong>{{ follower_count }}</strong>
+                <span>Follower</span>
+            </div>
+            <div class="stat-item">
+                <strong>{{ following_count }}</strong>
+                <span>Following</span>
+            </div>
+        </div>
+    </div>
+
+    {% if following_users %}
+    <div class="card">
+        <h2>👥 Mengikuti</h2>
+        <div class="following-list">
+            {% for fu in following_users %}
+            <a href="{{ url_for('profil', username=fu.username) }}" class="chip-user">@{{ fu.username }}</a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <h2>Resep dari @{{ user_pub.username }}</h2>
+
+    {% if resep_list %}
+        <ul class="resep-list">
+            {% for resep in resep_list %}
+            <li>
+                <a href="{{ url_for('detail', resep_id=resep.id) }}" class="kartu-link">
+                    <h3>{{ resep.nama }}</h3>
+                    <p class="meta">{{ resep.kategori }} · {{ resep.waktu }}</p>
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="kosong">Belum ada resep.</p>
+    {% endif %}
+</body>
+</html>

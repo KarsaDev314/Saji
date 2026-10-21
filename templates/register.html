@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Daftar - Panduan Memasak</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <a href="{{ url_for('index') }}" class="kembali">← Kembali ke daftar</a>
+    <h1>📝 Daftar Akun</h1>
+
+    {% if error %}
+    <p class="error">⚠️ {{ error }}</p>
+    {% endif %}
+
+    <form method="POST" class="form-tambah" style="max-width:400px;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label>
+            Username (3-30 karakter, tanpa spasi)
+            <input type="text" name="username" required autofocus minlength="3" maxlength="30">
+        </label>
+        <label>
+            Password (minimal 6 karakter)
+            <input type="password" name="password" required minlength="6">
+        </label>
+        <label>
+            Ulangi Password
+            <input type="password" name="password2" required minlength="6">
+        </label>
+        <div class="aksi">
+            <button type="submit">✅ Buat Akun</button>
+        </div>
+    </form>
+
+    <p>Sudah punya akun? <a href="{{ url_for('login') }}">Login di sini</a></p>
+</body>
+</html>

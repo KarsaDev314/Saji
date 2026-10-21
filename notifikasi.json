@@ -1,0 +1,114 @@
+{
+  "notifikasi": [
+    {
+      "id": "3b8acc6f",
+      "penerima_id": 5,
+      "pengirim_id": 3,
+      "pengirim_username": "yani",
+      "tipe": "komentar",
+      "pesan": "mengomentari resepmu 'Mie Goreng Sederhana'",
+      "tautan": "/resep/2",
+      "waktu": "2026-10-20 14:21",
+      "dibaca": true
+    },
+    {
+      "id": "d0820842",
+      "penerima_id": 5,
+      "pengirim_id": 3,
+      "pengirim_username": "yani",
+      "tipe": "komentar",
+      "pesan": "mengomentari resepmu 'Mie Goreng Sederhana'",
+      "tautan": "/resep/2",
+      "waktu": "2026-10-20 14:21",
+      "dibaca": true
+    },
+    {
+      "id": "d65cd1e3",
+      "penerima_id": 5,
+      "pengirim_id": 4,
+      "pengirim_username": "yanto",
+      "tipe": "komentar",
+      "pesan": "mengomentari resepmu 'Mie Goreng Sederhana'",
+      "tautan": "/resep/2",
+      "waktu": "2026-10-20 14:27",
+      "dibaca": true
+    },
+    {
+      "id": "b4696a9e",
+      "penerima_id": 5,
+      "pengirim_id": 4,
+      "pengirim_username": "yanto",
+      "tipe": "komentar",
+      "pesan": "mengomentari resepmu 'Mie Goreng Sederhana'",
+      "tautan": "/resep/2",
+      "waktu": "2026-10-20 14:27",
+      "dibaca": true
+    },
+    {
+      "id": "069888a1",
+      "penerima_id": 5,
+      "pengirim_id": 4,
+      "pengirim_username": "yanto",
+      "tipe": "komentar",
+      "pesan": "mengomentari resepmu 'Mie Goreng Sederhana'",
+      "tautan": "/resep/2",
+      "waktu": "2026-10-20 14:27",
+      "dibaca": true
+    },
+    {
+      "id": "99eafaca",
+      "penerima_id": 5,
+      "pengirim_id": 4,
+      "pengirim_username": "yanto",
+      "tipe": "komentar",
+      "pesan": "mengomentari resepmu 'Mie Goreng Sederhana'",
+      "tautan": "/resep/2",
+      "waktu": "2026-10-20 14:29",
+      "dibaca": true
+    },
+    {
+      "id": "2a370577",
+      "penerima_id": 5,
+      "pengirim_id": 4,
+      "pengirim_username": "yanto",
+      "tipe": "komentar",
+      "pesan": "mengomentari resepmu 'Mie Goreng Sederhana'",
+      "tautan": "/resep/2",
+      "waktu": "2026-10-20 14:29",
+      "dibaca": true
+    },
+    {
+      "id": "ee307f1e",
+      "penerima_id": 5,
+      "pengirim_id": 4,
+      "pengirim_username": "yanto",
+      "tipe": "komentar",
+      "pesan": "mengomentari resepmu 'Mie Goreng Sederhana'",
+      "tautan": "/resep/2",
+      "waktu": "2026-10-20 14:33",
+      "dibaca": true
+    },
+    {
+      "id": "7980e624",
+      "penerima_id": 5,
+      "pengirim_id": 4,
+      "pengirim_username": "yanto",
+      "tipe": "komentar",
+      "pesan": "mengomentari resepmu 'Nasi Goreng'",
+      "tautan": "/resep/1",
+      "waktu": "2026-10-21 11:32",
+      "dibaca": false
+    },
+    {
+      "id": "808c849b",
+      "penerima_id": 5,
+      "pengirim_id": 4,
+      "pengirim_username": "yanto",
+      "tipe": "like",
+      "pesan": "menyukai resepmu 'Nasi Goreng'",
+      "tautan": "/resep/1",
+      "waktu": "2026-10-21 11:32",
+      "dibaca": false
+    }
+  ]
+}

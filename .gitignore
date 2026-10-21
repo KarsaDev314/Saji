@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Virtual env
+.venv/
+venv/
+env/
+
+# Data backup & arsip (jangan di-commit — berisi data user)
+_archive/
+*.json.bak
+*.lama
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/

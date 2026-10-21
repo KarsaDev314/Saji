@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ kode if kode else "404" }} - Panduan Memasak</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="halaman-error">
+        <div class="kode-error">{{ kode if kode else "404" }}</div>
+        <h1>{% if kode == 403 %}Akses Ditolak{% elif kode == 500 %}Ada Masalah di Server{% else %}Tidak Ditemukan{% endif %}</h1>
+        <p>{{ pesan if pesan else "Resep yang kamu cari tidak ada, atau sudah dihapus." }}</p>
+        <a href="{{ url_for('index') }}" class="tombol-kembali">← Kembali ke Daftar</a>
+    </div>
+</body>
+</html>

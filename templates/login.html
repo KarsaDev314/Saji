@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Panduan Memasak</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <a href="{{ url_for('index') }}" class="kembali">← Kembali ke daftar</a>
+    <h1>🔑 Login</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in messages %}
+        <p class="flash flash-{{ cat }}">{{ msg }}</p>
+      {% endfor %}
+    {% endwith %}
+
+    {% if error %}
+    <p class="error">⚠️ {{ error }}</p>
+    {% endif %}
+
+    <form method="POST" class="form-tambah" style="max-width:400px;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label>
+            Username
+            <input type="text" name="username" required autofocus>
+        </label>
+        <label>
+            Password
+            <input type="password" name="password" required>
+        </label>
+        <div class="aksi">
+            <button type="submit">🔑 Login</button>
+        </div>
+    </form>
+
+    <p>Belum punya akun? <a href="{{ url_for('register') }}">Daftar di sini</a></p>
+</body>
+</html>
