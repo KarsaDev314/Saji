@@ -1,10 +1,11 @@
 """Entry point aplikasi Panduan Memasak."""
+import os
 from flask import Flask, render_template
 from flask_login import current_user
 
 import config
-import migrations
 import notification_service
+from db import db
 from extensions import csrf, login_manager
 from routes import register_all
 from user_service import find_by_id
@@ -17,18 +18,28 @@ def create_app():
     app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
     app.config["SESSION_COOKIE_SECURE"] = False  # True kalau sudah HTTPS
 
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "saji.db")
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    db.init_app(app)
+
     csrf.init_app(app)
     login_manager.init_app(app)
     login_manager.login_view = "login"
     login_manager.login_message = "Silakan login dulu untuk mengakses halaman ini."
     login_manager.login_message_category = "info"
 
-    migrations.run_all()
 
     register_all(app)
     _register_error_handlers(app)
     _register_context_processors(app)
     _register_security_headers(app)
+
+    with app.app_context():
+        from db_models import (User, Recipe, Follow, Favorite, RecipeLike,
+                               Comment, CommentReaction, Notification)
+        db.create_all()
+
     return app
 
 

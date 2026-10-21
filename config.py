@@ -7,10 +7,6 @@ FLASK_DEBUG = os.environ.get("FLASK_DEBUG", "0") == "1"
 HOST = "127.0.0.1"
 PORT = 5000
 
-# Path data
-DATA_FILE = "resep.json"
-USERS_FILE = "users.json"
-NOTIF_FILE = "notifikasi.json"
 
 # Domain
 KATEGORI_VALID = ("Makanan Utama", "Minuman", "Camilan", "Dessert", "Lain-lain")

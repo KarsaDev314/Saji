@@ -21,3 +21,8 @@ Thumbs.db
 # Editor
 .vscode/
 .idea/
+
+# Database
+*.db
+*.db-journal
+*.pre-sqlite.bak
