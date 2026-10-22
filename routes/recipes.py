@@ -1,9 +1,10 @@
 """Route mutasi resep."""
-from flask import abort, redirect, render_template, request, url_for
-from flask_login import login_required
+from flask import abort, redirect, render_template, request, url_for, jsonify
+from flask_login import login_required, current_user
 
 import config
 import recipe_service
+import user_service
 import validators
 from permissions import can_edit_recipe
 
@@ -62,6 +63,12 @@ def register(app):
         if recipe_service.find(resep_id) is None:
             abort(404)
         recipe_service.toggle_favorite(resep_id)
+        
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            record = user_service.current_record()
+            is_fav = resep_id in record.get("favorit_ids", [])
+            return jsonify({"status": "ok", "is_favorit": is_fav})
+            
         return redirect(request.referrer or url_for("index"))
 
     @app.route("/resep/<int:resep_id>/rating", methods=["POST"])
@@ -85,4 +92,11 @@ def register(app):
         if recipe_service.find(resep_id) is None:
             abort(404)
         recipe_service.toggle_like(resep_id)
+        
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            resep_baru = recipe_service.find(resep_id)
+            likes = resep_baru.get("likes", [])
+            is_liked = int(current_user.id) in likes
+            return jsonify({"status": "ok", "likes_count": len(likes), "is_liked": is_liked})
+            
         return redirect(url_for("detail", resep_id=resep_id) + "#like-section")

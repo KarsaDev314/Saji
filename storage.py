@@ -118,11 +118,21 @@ def save_recipes(recipes_data):
         recipe.catatan = r_data.get("catatan", "")
         recipe.user_id = r_data.get("user_id", 0)
         
+        # 1. Sync Likes Resep
         db.session.query(RecipeLike).filter_by(recipe_id=recipe.id).delete()
         for uid in r_data.get("likes", []):
             db.session.add(RecipeLike(user_id=uid, recipe_id=recipe.id))
             
+        # 2. HAPUS REAKSI KOMENTAR DULU (BIAR GAK ERROR UNIQUE CONSTRAINT)
+        existing_comments = Comment.query.filter_by(recipe_id=recipe.id).all()
+        comment_ids = [c.id for c in existing_comments]
+        if comment_ids:
+            db.session.query(CommentReaction).filter(CommentReaction.comment_id.in_(comment_ids)).delete(synchronize_session=False)
+            
+        # 3. Baru Hapus Komentarnya
         db.session.query(Comment).filter_by(recipe_id=recipe.id).delete()
+        
+        # 4. Masukin Ulang Komentar Baru beserta Reaksinya
         flat_comments = _flatten_comments_for_save(r_data.get("comments", []))
         for c_data in flat_comments:
             db.session.add(Comment(
@@ -130,6 +140,7 @@ def save_recipes(recipes_data):
                 username=c_data.get("username", ""), teks=c_data["teks"],
                 waktu=c_data.get("waktu", ""), parent_id=c_data.get("parent_id")
             ))
+            # Masukin Like/Dislike komentar
             for uid in c_data.get("likes", []):
                 db.session.add(CommentReaction(comment_id=c_data["id"], user_id=uid, type="like"))
             for uid in c_data.get("dislikes", []):

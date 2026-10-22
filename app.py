@@ -55,6 +55,7 @@ def _register_error_handlers(app):
 
     @app.errorhandler(500)
     def server_error(e):
+        db.session.rollback()  # <--- TAMBAHIN INI
         return render_template("404.html", kode=500), 500
 
 
