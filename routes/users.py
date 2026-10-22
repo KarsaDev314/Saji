@@ -1,5 +1,5 @@
 """Route profil, follow, pengaturan, daftar pengguna."""
-from flask import abort, flash, redirect, render_template, request, url_for
+from flask import abort, flash, redirect, render_template, request, url_for, jsonify
 from flask_login import current_user, login_required
 
 import config
@@ -19,7 +19,9 @@ def register(app):
             abort(404)
 
         resep_user = recipe_service.by_owner(recipe_service.all(), target["id"])
-        follower_count, following_count, following_users = user_service.follow_stats(
+        
+        # Ambil 4 nilai dari follow_stats (termasuk followers_list)
+        follower_count, following_count, following_users, followers_list = user_service.follow_stats(
             users, target["id"]
         )
 
@@ -38,6 +40,7 @@ def register(app):
             follower_count=follower_count,
             following_count=following_count,
             following_users=following_users,
+            followers_list=followers_list,
             sudah_follow=sudah_follow,
             user_id=target["id"],
             user_idku=me_id,
@@ -49,7 +52,24 @@ def register(app):
         result = user_service.toggle_follow(target_id)
         if result is None:
             abort(404)
-        flash(*result)
+            
+        pesan, kategori = result
+        
+        # AJAX Handling
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            users = user_service.all()
+            follower_count = sum(1 for u in users if target_id in u.get("following", []))
+            me = user_service.current_record()
+            is_follow = target_id in me.get("following", [])
+            
+            return jsonify({
+                "status": "ok", 
+                "is_follow": is_follow, 
+                "follower_count": follower_count
+            })
+            
+        # Fallback redirect
+        flash(pesan, kategori)
         return redirect(request.referrer or url_for("index"))
 
     @app.route("/pengaturan", methods=["GET", "POST"])

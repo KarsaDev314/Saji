@@ -22,7 +22,7 @@ def find(comments, comment_id):
 
 
 def add(recipe_id, text, parent_id=None):
-    """Tambah komentar. Return True kalau berhasil, False kalau gagal."""
+    """Tambah komentar. Return dict komentar baru kalau berhasil, None kalau gagal."""
     recipes = storage.load_recipes()
     uid = int(current_user.id)
 
@@ -32,7 +32,7 @@ def add(recipe_id, text, parent_id=None):
             target = r
             break
     if target is None:
-        return False
+        return None
 
     new_comment = {
         "id": str(uuid.uuid4())[:8],
@@ -53,15 +53,16 @@ def add(recipe_id, text, parent_id=None):
         target.setdefault("comments", []).append(new_comment)
         added = True
 
-    storage.save_recipes(recipes)
-
-    if added and target.get("user_id", 0) not in (0, uid):
-        notification_service.send(
-            target["user_id"], uid, config.NOTIF_KOMENTAR,
-            f"mengomentari resepmu '{target['nama']}'",
-            f"/resep/{recipe_id}",
-        )
-    return added
+    if added:
+        storage.save_recipes(recipes)
+        if target.get("user_id", 0) not in (0, uid):
+            notification_service.send(
+                target["user_id"], uid, config.NOTIF_KOMENTAR,
+                f"mengomentari resepmu '{target['nama']}'",
+                f"/resep/{recipe_id}",
+            )
+        return new_comment
+    return None
 
 
 def update_text(recipe_id, comment_id, new_text):
@@ -98,7 +99,6 @@ def _remove_recursive(comments, target_id):
 
 
 def toggle_reaction(recipe_id, comment_id, kind):
-    """kind: 'like' atau 'dislike'. Like/dislike saling eksklusif."""
     same, opposite = ("likes", "dislikes") if kind == "like" else ("dislikes", "likes")
     recipes = storage.load_recipes()
     uid = int(current_user.id)

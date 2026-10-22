@@ -79,13 +79,16 @@ def update_profile(user_id, username, bio):
 
 
 def follow_stats(users, user_id):
-    """Return (follower_count, following_count, following_users)."""
-    following = next(
+    """Return (follower_count, following_count, following_users, followers_list)."""
+    following_ids = next(
         (u.get("following", []) for u in users if u["id"] == user_id), []
     )
-    follower_count = sum(1 for u in users if user_id in u.get("following", []))
-    following_users = [u for u in users if u["id"] in following]
-    return follower_count, len(following), following_users
+    following_users = [u for u in users if u["id"] in following_ids]
+    
+    # Cari siapa aja yang nge-follow user ini
+    followers_list = [u for u in users if user_id in u.get("following", [])]
+    
+    return len(followers_list), len(following_ids), following_users, followers_list
 
 
 def toggle_follow(target_id):

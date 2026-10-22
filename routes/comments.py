@@ -1,5 +1,5 @@
 """Route komentar: tambah, edit, hapus, like, dislike."""
-from flask import abort, flash, redirect, request, url_for
+from flask import abort, flash, redirect, request, url_for, jsonify, render_template
 from flask_login import login_required
 
 import comment_service
@@ -12,14 +12,25 @@ def register(app):
     @app.route("/resep/<int:resep_id>/komentar", methods=["POST"])
     @login_required
     def tambah_komentar(resep_id):
-        if recipe_service.find(resep_id) is None:
+        resep = recipe_service.find(resep_id)
+        if resep is None: 
             abort(404)
+
         teks = request.form.get("teks", "").strip()
         if not teks:
             flash("Komentar tidak boleh kosong.", config.FLASH_INFO)
             return redirect(url_for("detail", resep_id=resep_id) + "#komentar")
+            
         parent_id = request.form.get("parent_id")
-        comment_service.add(resep_id, teks, parent_id)
+        new_komentar = comment_service.add(resep_id, teks, parent_id)
+
+        # Handle AJAX
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            if new_komentar:
+                html = render_template("_komentar_item.html", k=new_komentar, resep=resep, boleh_moderasi_komentar=can_moderate_comment)
+                return jsonify({"status": "ok", "html": html})
+            return jsonify({"status": "error", "message": "Gagal menambahkan komentar"}), 400
+            
         return redirect(url_for("detail", resep_id=resep_id) + "#komentar")
 
     @app.route("/resep/<int:resep_id>/komentar/<komentar_id>/like", methods=["POST"])

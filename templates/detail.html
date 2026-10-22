@@ -88,64 +88,22 @@
             </div>
             {% endif %}
 
-            <!-- Bagian Komentar (Tetap di Sidebar) -->
-            <div class="card" id="komentar">
-                <h2>💬 Komentar ({{ resep.get('comments', [])|length }})</h2>
-                
-                {% if current_user.is_authenticated %}
-                <form method="POST" action="{{ url_for('tambah_komentar', resep_id=resep.id) }}" class="form-stack">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <textarea name="teks" rows="2" placeholder="Tulis komentar..." maxlength="500" required class="input-textarea"></textarea>
-                    <button type="submit" class="btn-primary">Kirim</button>
-                </form>
-                {% endif %}
+                <!-- Bagian Komentar -->
+    <div class="card" id="komentar">
+        <h2>💬 Komentar ({{ resep.get('comments', [])|length }})</h2>
+        
+        {% if current_user.is_authenticated %}
+        <form method="POST" action="{{ url_for('tambah_komentar', resep_id=resep.id) }}" class="form-stack ajax-comment-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <textarea name="teks" rows="2" placeholder="Tulis komentar..." maxlength="500" required class="input-textarea"></textarea>
+            <button type="submit" class="btn-primary">Kirim</button>
+        </form>
+        {% endif %}
 
-                <div class="comment-list">
-                    {% macro render_komentar(k, resep, is_reply=False) %}
-                    <div class="comment-item" id="k-{{ k.id }}">
-                        <div class="comment-header">
-                            <a href="{{ url_for('profil', username=k.username) }}" class="comment-user">@{{ k.username }}</a>
-                            <span class="comment-time">{{ k.waktu }}</span>
-                        </div>
-                        <p class="comment-text">{{ k.teks }}</p>
-                        
-                        <div class="comment-actions">
-                            {% if current_user.is_authenticated %}
-                                <button type="button" class="btn-text" onclick="toggleReply('{{ k.id }}')">↩ Balas</button>
-                                {% if boleh_moderasi_komentar(k, resep) %}
-                                    <a href="?edit={{ k.id }}#k-{{ k.id }}" class="btn-text">✏️ Edit</a>
-                                    <form method="POST" action="{{ url_for('hapus_komentar', resep_id=resep.id, komentar_id=k.id) }}" class="form-inline" onsubmit="bukaModal(event, this)">
-                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                        <button type="submit" class="btn-text text-danger">🗑 Hapus</button>
-                                    </form>
-                                {% endif %}
-                            {% endif %}
-                        </div>
-
-                        <div id="reply-form-{{ k.id }}" class="reply-form" style="display: none;">
-                            <form method="POST" action="{{ url_for('tambah_komentar', resep_id=resep.id) }}" class="form-stack">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                <input type="hidden" name="parent_id" value="{{ k.id }}">
-                                <textarea name="teks" rows="2" placeholder="Balas @{{ k.username }}..." required class="input-textarea"></textarea>
-                                <button type="submit" class="btn-primary">Kirim</button>
-                            </form>
-                        </div>
-
-                        {% if k.replies %}
-                        <div class="comment-replies">
-                            {% for rep in k.replies %}
-                                {{ render_komentar(rep, resep, is_reply=True) }}
-                            {% endfor %}
-                        </div>
-                        {% endif %}
-                    </div>
-                    {% endmacro %}
-
-                    {% for k in resep.get('comments', [])|reverse %}
-                        {{ render_komentar(k, resep, is_reply=False) }}
-                    {% endfor %}
-                </div>
-            </div>
+        <div class="comment-list">
+            {% for k in resep.get('comments', [])|reverse %}
+                {% include '_komentar_item.html' %}
+            {% endfor %}
         </div>
     </div>
 
