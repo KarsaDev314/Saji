@@ -256,4 +256,39 @@ document.addEventListener('DOMContentLoaded', () => {
                     item.click(); // Panggil fungsi klik
                 }
             });
+        });    
+        
+                // 8. SETTINGS DROPDOWN & DARK MODE (ROBUST VERSION)
+    const themeCheckbox = document.getElementById('theme-checkbox');
+
+    // Event Delegation buat tombol gear (Anti Gagal)
+    document.addEventListener('click', function(e) {
+        const settingsBtn = e.target.closest('#settings-btn');
+        const settingsMenu = document.getElementById('settings-menu');
+
+        if (settingsBtn && settingsMenu) {
+            e.preventDefault();
+            e.stopPropagation();
+            settingsMenu.classList.toggle('show');
+        } else if (settingsMenu && !settingsMenu.contains(e.target)) {
+            // Tutup menu kalau klik di luar
+            settingsMenu.classList.remove('show');
+        }
+    });
+
+    // Logic Dark Mode (Sinkronisasi dengan localStorage)
+    if (themeCheckbox) {
+        if (localStorage.getItem('saji_theme') === 'dark') {
+            themeCheckbox.checked = true;
+        }
+
+        themeCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('saji_theme', 'dark');
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+                localStorage.setItem('saji_theme', 'light');
+            }
         });
+    }

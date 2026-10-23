@@ -1356,4 +1356,222 @@ button, .btn-primary, .btn-outline, .btn-danger, .btn-warning, .btn-success {
 }
 button:active, .btn-primary:active, .btn-outline:active {
     transform: scale(0.97) !important; /* Efek ditekan */
+}/* ===== SETTINGS DROPDOWN & DARK MODE ===== */
+.settings-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.btn-settings {
+    background: transparent;
+    border: none;
+    font-size: 1.3rem;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background 0.2s, transform 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-settings:hover {
+    background: #f0f4f8;
+    transform: rotate(45deg);
+}
+
+.settings-menu {
+    display: none; /* Sembunyi default */
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 10px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    min-width: 220px;
+    z-index: 1000;
+    flex-direction: column;
+    padding: 8px 0;
+}
+
+.settings-menu.show {
+    display: flex;
+}
+
+.settings-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    color: var(--text-main);
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: background 0.2s;
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.settings-item:hover {
+    background: #f0f4f8;
+    text-decoration: none;
+}
+
+.settings-item.text-danger:hover {
+    background: #fff5f5;
+    color: var(--danger);
+}
+
+.settings-divider {
+    border: none;
+    border-top: 1px solid var(--border-color);
+    margin: 6px 0;
+}
+
+.settings-form { margin: 0; width: 100%; }
+
+/* Toggle Switch Dark Mode */
+.theme-row { cursor: default; }
+.theme-row:hover { background: transparent; }
+
+.theme-switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 20px;
+}
+
+.theme-switch input { opacity: 0; width: 0; height: 0; }
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 20px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 14px; width: 14px;
+    left: 3px; bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+.theme-switch input:checked + .slider {
+    background-color: var(--primary);
+}
+
+.theme-switch input:checked + .slider:before {
+    transform: translateX(20px);
+}
+
+/* ===== DARK MODE: TOTAL OVERRIDE (FIXED) ===== */
+[data-theme="dark"] {
+    --bg-color: #121212;
+    --card-bg: #1e1e1e;
+    --text-main: #f1f1f1;
+    --text-muted: #a0aec0;
+    --border-color: #333333;
+}
+
+/* 1. Background Utama */
+[data-theme="dark"] body,
+[data-theme="dark"] .navbar,
+[data-theme="dark"] .card,
+[data-theme="dark"] .recipe-card,
+[data-theme="dark"] .filter-bar,
+[data-theme="dark"] .mode-switcher,
+[data-theme="dark"] .settings-menu,
+[data-theme="dark"] .dropdown-menu,
+[data-theme="dark"] .search-history-box,
+[data-theme="dark"] .user-card,
+[data-theme="dark"] .profile-header-card,
+[data-theme="dark"] .profile-stats,
+[data-theme="dark"] .notification-card,
+[data-theme="dark"] .comment-item,
+[data-theme="dark"] .modal-box,
+[data-theme="dark"] .auth-box {
+    background-color: var(--card-bg) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-main) !important;
+}
+
+/* 2. Elemen yang warnanya lebih gelap */
+[data-theme="dark"] .card-action,
+[data-theme="dark"] .user-card-action,
+[data-theme="dark"] .history-header,
+[data-theme="dark"] .dropdown-menu li:hover,
+[data-theme="dark"] .settings-item:hover,
+[data-theme="dark"] .notification-item:hover,
+[data-theme="dark"] .stat-item:hover {
+    background-color: #2a2a2a !important;
+}
+
+/* 3. Teks */
+[data-theme="dark"] h1, [data-theme="dark"] h2, [data-theme="dark"] h3,
+[data-theme="dark"] p, [data-theme="dark"] span, [data-theme="dark"] strong,
+[data-theme="dark"] label, [data-theme="dark"] .brand, [data-theme="dark"] .card-body h3,
+[data-theme="dark"] .profile-info h1, [data-theme="dark"] .stat-item strong {
+    color: var(--text-main) !important;
+}
+[data-theme="dark"] .text-muted, [data-theme="dark"] .meta, [data-theme="dark"] .comment-time {
+    color: var(--text-muted) !important;
+}
+
+/* 4. Input & Tombol */
+[data-theme="dark"] input, 
+[data-theme="dark"] textarea, 
+[data-theme="dark"] select,
+[data-theme="dark"] .dropdown-btn {
+    background-color: #121212 !important;
+    color: var(--text-main) !important;
+    border-color: #444 !important;
+}
+[data-theme="dark"] .btn-outline,
+[data-theme="dark"] .btn-icon {
+    background-color: transparent !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-main) !important;
+}
+[data-theme="dark"] hr,
+[data-theme="dark"] .section-divider,
+[data-theme="dark"] .settings-divider {
+    border-color: var(--border-color) !important;
+}/* ===== FIX KOTAK LIKE & RATING DI DARK MODE ===== */
+[data-theme="dark"] .interaction-group {
+    background-color: #2a2a2a !important; /* Sesuaiin sama warna card action */
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .btn-like-sm {
+    background-color: transparent !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-main) !important;
+}
+
+[data-theme="dark"] .btn-like-sm:hover,
+[data-theme="dark"] .btn-like-sm.aktif {
+    background-color: rgba(229, 62, 62, 0.2) !important; /* Merah transparan */
+    color: var(--danger) !important;
+    border-color: var(--danger) !important;
+}/* ===== FIX BINTANG RATING DI DARK MODE ===== */
+[data-theme="dark"] .star-rating label {
+    color: #4a5568 !important; /* Warna abu-abu gelap buat bintang kosong */
+}
+
+[data-theme="dark"] .star-rating input:checked ~ label,
+[data-theme="dark"] .star-rating label:hover,
+[data-theme="dark"] .star-rating label:hover ~ label {
+    color: var(--warning) !important; /* Warna kuning buat bintang nyala */
 }
