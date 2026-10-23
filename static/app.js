@@ -5,37 +5,31 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     const themeCheckbox = document.getElementById('theme-checkbox');
     
-        // Fungsi buka/tutup menu
     window.toggleSettingsMenu = function(e) {
         if (e) { e.preventDefault(); e.stopPropagation(); }
         const menu = document.getElementById('settings-menu');
         const btn = document.getElementById('settings-btn');
         if (menu) {
             menu.classList.toggle('show');
-            if (btn) btn.classList.toggle('active'); // Biar gear-nya nyala & muter
+            if (btn) btn.classList.toggle('active');
         }
     };
 
-    // Tutup menu kalau klik di luar area
     document.addEventListener('click', function(e) {
         const menu = document.getElementById('settings-menu');
         const btn = document.getElementById('settings-btn');
         if (menu && menu.classList.contains('show')) {
             if (!menu.contains(e.target) && (!btn || !btn.contains(e.target))) {
                 menu.classList.remove('show');
-                if (btn) btn.classList.remove('active'); // Balikin gear ke posisi semula
+                if (btn) btn.classList.remove('active');
             }
         }
     });
 
-    // Logic Dark Mode (Cek apakah elemen ada sebelum jalan)
     if (themeCheckbox) {
-        // Sinkronisasi status checkbox sama localStorage
         if (localStorage.getItem('saji_theme') === 'dark') {
             themeCheckbox.checked = true;
         }
-
-        // Event listener pas digeser
         themeCheckbox.addEventListener('change', function() {
             if (this.checked) {
                 document.documentElement.setAttribute('data-theme', 'dark');
@@ -59,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return response.json();
     };
 
-    // --- LIKE ---
+    // --- LIKE (RESEP) ---
     document.querySelectorAll('form[action*="/like"]').forEach(form => {
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -76,41 +70,40 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- FAVORIT ---
+            // --- FAVORIT ---
     document.querySelectorAll('form[action*="/favorit"]').forEach(form => {
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = form.querySelector('button');
+            const svg = btn.querySelector('svg'); // Ambil elemen SVG-nya aja
+            
             try {
                 const data = await fetchPost(form.action, new FormData(form));
                 if (data.status === 'ok') {
                     btn.classList.toggle('aktif', data.is_favorit);
-                    if (btn.classList.contains('btn-icon')) {
-                        btn.innerHTML = data.is_favorit ? '★' : '☆';
-                    } else {
-                        btn.innerHTML = data.is_favorit ? '⭐ Favorit' : '☆ Favorit';
+                    
+                    // Cuma ganti warna fill SVG, gak ngeganti teks/tombol
+                    if (svg) {
+                        svg.setAttribute('fill', data.is_favorit ? 'currentColor' : 'none');
                     }
                 }
             } catch (err) { console.error("Gagal Favorit:", err); }
         });
     });
 
-        // --- FOLLOW ---
+    // --- FOLLOW ---
     document.querySelectorAll('form[action^="/follow/"]').forEach(form => {
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = form.querySelector('button');
-            // Cari elemen follower count di dalam card yang sama
             const card = btn.closest('.user-card');
             const followerCountSpan = card ? card.querySelector('.follower-count-text') : null;
             
             try {
                 const data = await fetchPost(form.action, new FormData(form));
                 if (data.status === 'ok') {
-                    // 1. Ubah Teks Tombol
                     btn.innerHTML = data.is_follow ? 'Mengikuti' : 'Ikuti';
                     
-                    // 2. Swap Class Warna Tombol (Ini yang tadi ilang!)
                     if (data.is_follow) {
                         btn.classList.remove('btn-primary');
                         btn.classList.add('btn-outline');
@@ -119,7 +112,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         btn.classList.add('btn-primary');
                     }
                     
-                    // 3. Update Angka Follower secara Live
                     if (followerCountSpan) {
                         followerCountSpan.textContent = data.follower_count;
                     }
@@ -128,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- KOMENTAR ---
+    // --- KOMENTAR (KIRIM & BALAS) ---
     document.addEventListener('submit', async (e) => {
         if (e.target.matches('.ajax-comment-form')) {
             e.preventDefault();
@@ -155,17 +147,65 @@ document.addEventListener('DOMContentLoaded', () => {
                             parentComment.appendChild(repliesContainer);
                         }
                         repliesContainer.appendChild(newCommentNode);
+                        form.parentElement.style.display = 'none'; 
                     } else {
                         const list = document.querySelector('.comment-list');
                         list.insertBefore(newCommentNode, list.firstChild);
                     }
                     form.reset();
                 }
-            } catch (err) { console.error("Gagal kirim komentar:", err); } 
-            finally {
+            } catch (err) { 
+                console.error("Gagal kirim komentar:", err); 
+            } finally {
                 btn.innerHTML = oldText;
                 btn.disabled = false;
             }
+        }
+    });
+
+        // --- TOGGLE EDIT & CANCEL EDIT ---
+    window.toggleEdit = function(id) {
+        document.getElementById(`text-${id}`).style.display = 'none';
+        document.getElementById(`edit-form-${id}`).style.display = 'block';
+    };
+
+    window.cancelEdit = function(id) {
+        document.getElementById(`text-${id}`).style.display = 'block';
+        document.getElementById(`edit-form-${id}`).style.display = 'none';
+    };
+
+    // --- SUBMIT EDIT KOMENTAR (AJAX) ---
+    document.addEventListener('submit', async (e) => {
+        if (e.target.matches('.ajax-edit-form')) {
+            e.preventDefault();
+            const form = e.target;
+            const commentId = form.id.replace('edit-form-', ''); // Ambil ID dari ID form
+            
+            try {
+                const data = await fetchPost(form.action, new FormData(form));
+                if (data.status === 'ok') {
+                    // 1. Ganti teks lama dengan teks baru
+                    document.getElementById(`text-${commentId}`).innerText = data.teks;
+                    // 2. Sembunyikan form, munculin teks lagi
+                    cancelEdit(commentId);
+                }
+            } catch (err) { console.error("Gagal edit komentar:", err); }
+        }
+    });
+
+    // --- HAPUS KOMENTAR (AJAX) ---
+    document.addEventListener('submit', async (e) => {
+        if (e.target.matches('.ajax-delete-comment')) {
+            e.preventDefault();
+            const form = e.target;
+            const commentId = form.action.split('/').filter(Boolean).slice(-2)[0]; 
+            try {
+                const data = await fetchPost(form.action, new FormData(form));
+                if (data.status === 'ok') {
+                    const el = document.getElementById(`k-${commentId}`);
+                    if (el) el.remove();
+                }
+            } catch (err) { console.error("Gagal hapus komentar:", err); }
         }
     });
 
@@ -276,13 +316,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-        // --- LAPOR BUG ---
+
+    // --- LAPOR BUG ---
     window.bukaLaporBug = function(e) {
         if (e) { e.preventDefault(); e.stopPropagation(); }
         const modal = document.getElementById('bug-modal');
         if (modal) modal.style.display = 'flex';
         
-        // Tutup menu settings biar gak numpuk
         const menu = document.getElementById('settings-menu');
         const btn = document.getElementById('settings-btn');
         if (menu) menu.classList.remove('show');
@@ -301,7 +341,6 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.innerHTML = 'Mengirim...';
         btn.disabled = true;
 
-        // Simulasi proses kirim (karena belum ada route backend-nya)
         setTimeout(() => {
             alert('Terima kasih! Laporan bug kamu sudah kami terima.');
             tutupLaporBug();
@@ -311,7 +350,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 800);
     };
 
-    // Tutup modal kalau klik area gelap di luar kotak
     window.addEventListener('click', function(e) {
         const modal = document.getElementById('bug-modal');
         if (e.target === modal) {

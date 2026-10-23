@@ -48,9 +48,13 @@
             </div>
 
             <div class="form-actions">
-                <button type="submit" class="btn-primary btn-lg">
-                    {% if mode == 'edit' %}💾 Simpan Perubahan{% else %}🚀 Publikasikan Resep{% endif %}
-                </button>
+                <button type="submit" class="btn-primary btn-lg" style="display: flex; align-items: center; gap: 8px; justify-content: center;">
+    {% if mode == 'edit' %}
+        {{ icons.icon_save() }} Simpan Perubahan
+    {% else %}
+        {{ icons.icon_rocket() }} Publikasikan Resep
+    {% endif %}
+</button>
             </div>
         </form>
     </div>

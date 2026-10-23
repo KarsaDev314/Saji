@@ -1,119 +1,68 @@
-"""Operasi bisnis komentar."""
-from datetime import datetime
-import uuid
-
+from core.db import db
+from core.db_models import Comment, CommentReaction, User
 from flask_login import current_user
 
-import config
-from services import notification_service
-from services import storage
-
-
-def find(comments, comment_id):
-    """Cari komentar by ID, rekursif ke balasan."""
-    for c in comments:
-        if c.get("id") == comment_id:
-            return c
-        if c.get("replies"):
-            found = find(c["replies"], comment_id)
-            if found:
-                return found
-    return None
-
-
-def add(recipe_id, text, parent_id=None):
-    """Tambah komentar. Return dict komentar baru kalau berhasil, None kalau gagal."""
-    recipes = storage.load_recipes()
-    uid = int(current_user.id)
-
-    target = None
-    for r in recipes:
-        if r["id"] == recipe_id:
-            target = r
-            break
-    if target is None:
-        return None
-
-    new_comment = {
-        "id": str(uuid.uuid4())[:8],
-        "user_id": uid,
-        "username": current_user.username,
-        "teks": text[:config.MAX_KOMENTAR],
-        "waktu": datetime.now().strftime("%Y-%m-%d %H:%M"),
-        "likes": [], "dislikes": [], "replies": [],
+def _to_dict(c):
+    """Ubah objek Comment jadi dictionary biar dibaca template HTML."""
+    u = User.query.get(c.user_id)
+    return {
+        "id": c.id,
+        "user_id": c.user_id,
+        "username": u.username if u else "Unknown",
+        "profile_pic": u.profile_pic if u else "default_avatar.png",
+        "teks": c.text,
+        "waktu": c.created_at.strftime("%Y-%m-%d %H:%M"),
+        "replies": [_to_dict(r) for r in Comment.query.filter_by(parent_id=c.id).all()]
     }
 
-    added = False
-    if parent_id:
-        parent = find(target.get("comments", []), parent_id)
-        if parent:
-            parent["replies"].append(new_comment)
-            added = True
-    else:
-        target.setdefault("comments", []).append(new_comment)
-        added = True
+def add(recipe_id, text, parent_id=None):
+    new_c = Comment(
+        text=text,
+        user_id=int(current_user.id),
+        recipe_id=int(recipe_id),
+        parent_id=int(parent_id) if parent_id else None
+    )
+    db.session.add(new_c)
+    db.session.commit()
+    return _to_dict(new_c) # Balikin dalam bentuk dict
 
-    if added:
-        storage.save_recipes(recipes)
-        if target.get("user_id", 0) not in (0, uid):
-            notification_service.send(
-                target["user_id"], uid, config.NOTIF_KOMENTAR,
-                f"mengomentari resepmu '{target['nama']}'",
-                f"/resep/{recipe_id}",
-            )
-        return new_comment
-    return None
+def find_comment_by_id(comment_id):
+    return Comment.query.get(int(comment_id))
 
+def find(recipe_id):
+    comments = Comment.query.filter_by(recipe_id=int(recipe_id), parent_id=None).order_by(Comment.created_at.desc()).all()
+    return [_to_dict(c) for c in comments]
 
 def update_text(recipe_id, comment_id, new_text):
-    recipes = storage.load_recipes()
-    for r in recipes:
-        if r["id"] != recipe_id:
-            continue
-        c = find(r.get("comments", []), comment_id)
-        if c:
-            c["teks"] = new_text[:config.MAX_KOMENTAR]
-        break
-    storage.save_recipes(recipes)
-
+    c = Comment.query.get(int(comment_id))
+    if c:
+        c.text = new_text
+        db.session.commit()
 
 def delete(recipe_id, comment_id):
-    recipes = storage.load_recipes()
-    for r in recipes:
-        if r["id"] != recipe_id:
-            continue
-        r["comments"] = _remove_recursive(r.get("comments", []), comment_id)
-        break
-    storage.save_recipes(recipes)
-
-
-def _remove_recursive(comments, target_id):
-    result = []
-    for c in comments:
-        if c.get("id") == target_id:
-            continue
-        if c.get("replies"):
-            c["replies"] = _remove_recursive(c["replies"], target_id)
-        result.append(c)
-    return result
-
+    Comment.query.filter_by(parent_id=int(comment_id)).delete()
+    CommentReaction.query.filter_by(comment_id=int(comment_id)).delete()
+    c = Comment.query.get(int(comment_id))
+    if c:
+        db.session.delete(c)
+        db.session.commit()
 
 def toggle_reaction(recipe_id, comment_id, kind):
-    same, opposite = ("likes", "dislikes") if kind == "like" else ("dislikes", "likes")
-    recipes = storage.load_recipes()
-    uid = int(current_user.id)
+    existing = CommentReaction.query.filter_by(
+        user_id=int(current_user.id), 
+        comment_id=int(comment_id)
+    ).first()
 
-    for r in recipes:
-        if r["id"] != recipe_id:
-            continue
-        c = find(r.get("comments", []), comment_id)
-        if not c:
-            break
-        if uid in c.get(opposite, []):
-            c[opposite].remove(uid)
-        if uid in c.get(same, []):
-            c[same].remove(uid)
+    if existing:
+        if (existing.is_like and kind == 'like') or (not existing.is_like and kind == 'dislike'):
+            db.session.delete(existing)
         else:
-            c[same].append(uid)
-        break
-    storage.save_recipes(recipes)
+            existing.is_like = (kind == 'like')
+    else:
+        new_r = CommentReaction(
+            user_id=int(current_user.id),
+            comment_id=int(comment_id),
+            is_like=(kind == 'like')
+        )
+        db.session.add(new_r)
+    db.session.commit()

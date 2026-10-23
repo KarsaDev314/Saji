@@ -1,44 +1,32 @@
 {% extends 'base.html' %}
+{% import '_icons.html' as icons %}
 
 {% block title %}Notifikasi - Saji{% endblock %}
 
 {% block content %}
-    <div class="page-header" style="text-align: left; margin-bottom: 24px;">
+    <header class="page-header" style="text-align: left; margin-bottom: 32px;">
         <h1>Aktivitas</h1>
         <p>Interaksi terbaru dari komunitas Saji.</p>
-    </div>
+    </header>
 
-    <div class="notification-container">
-        {% if notif_list %}
-            <div class="notification-card">
-                {% for n in notif_list %}
-                <a href="{{ n.tautan }}" class="notification-item {% if not n.dibaca %}unread{% endif %}">
-                    
-                    <!-- Ikon Berdasarkan Tipe -->
-                    <div class="notif-icon {{ n.tipe }}">
-                        {% if n.tipe == 'follow' %}👤
-                        {% elif n.tipe == 'like' %}❤️
-                        {% elif n.tipe == 'komentar' %}💬
-                        {% else %}🔔
-                        {% endif %}
-                    </div>
-
-                    <!-- Isi Notifikasi -->
-                    <div class="notif-content">
-                        <p>
-                            <strong>@{{ n.pengirim_username or 'Seseorang' }}</strong> 
-                            {{ n.pesan }}
-                        </p>
-                        <span class="notif-time">{{ n.waktu }}</span>
-                    </div>
-
-                </a>
-                {% endfor %}
+    <div class="notification-list" style="display: flex; flex-direction: column; gap: 16px;">
+        {% for notif in notif_list %}
+            <div class="card" style="padding: 20px; display: flex; align-items: center; gap: 16px;">
+                <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--bg-color); display: flex; align-items: center; justify-content: center; color: var(--primary);">
+                    {{ icons.bell() }}
+                </div>
+                <div>
+                    <p style="margin: 0; font-size: 1rem; line-height: 1.5;">
+                        <strong>@{{ notif.pengirim_username }}</strong> {{ notif.pesan }}
+                    </p>
+                    <span class="text-muted" style="font-size: 0.85rem;">{{ notif.waktu }}</span>
+                </div>
             </div>
         {% else %}
-            <div class="empty-state">
-                <p>📭 Belum ada aktivitas. Ayo mulai posting resep atau follow teman!</p>
+            <div class="empty-state" style="padding: 60px 20px; text-align: center;">
+                {{ icons.icon_inbox() }}
+                <p>Belum ada aktivitas. Ayo mulai posting resep atau follow teman!</p>
             </div>
-        {% endif %}
+        {% endfor %}
     </div>
 {% endblock %}

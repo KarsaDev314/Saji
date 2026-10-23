@@ -10,11 +10,26 @@ def find(recipe_id):
     r = Recipe.query.get(int(recipe_id))
     if not r: return None
     likes = [l.user_id for l in RecipeLike.query.filter_by(recipe_id=r.id).all()]
+    
+    # Ambil data komentar
+    comments_raw = Comment.query.filter_by(recipe_id=r.id).order_by(Comment.created_at.desc()).all()
+    comments = []
+    for c in comments_raw:
+        u = User.query.get(c.user_id)
+        comments.append({
+            "id": c.id, "user_id": c.user_id, 
+            "username": u.username if u else "Unknown",
+            "profile_pic": u.profile_pic if u else "default_avatar.png",
+            "teks": c.text, "waktu": c.created_at.strftime("%Y-%m-%d %H:%M"), "replies": []
+        })
+
     return {
         "id": r.id, "nama": r.nama, "kategori": r.kategori, "waktu": r.waktu, 
         "bahan": r.bahan.split("\n") if r.bahan else [], 
         "langkah": r.langkah.split("\n") if r.langkah else [], 
-        "user_id": r.user_id, "rating": r.rating, "catatan": r.catatan, "likes": likes
+        "user_id": r.user_id, "rating": r.rating, "catatan": r.catatan, 
+        "likes": likes,
+        "comments": comments # <--- Ini yang bikin komentar muncul
     }
 
 def create(data):
@@ -53,9 +68,12 @@ def toggle_like(recipe_id):
     existing = RecipeLike.query.filter_by(user_id=int(current_user.id), recipe_id=recipe_id).first()
     if existing:
         db.session.delete(existing)
+        db.session.commit()
+        return False # Unliked
     else:
         db.session.add(RecipeLike(user_id=int(current_user.id), recipe_id=recipe_id))
-    db.session.commit()
+        db.session.commit()
+        return True # Liked
 
 def set_rating(recipe_id, rating, catatan):
     r = Recipe.query.get(int(recipe_id))
@@ -68,9 +86,12 @@ def toggle_favorite(recipe_id):
     existing = Favorite.query.filter_by(user_id=int(current_user.id), recipe_id=recipe_id).first()
     if existing:
         db.session.delete(existing)
+        db.session.commit()
+        return False
     else:
         db.session.add(Favorite(user_id=int(current_user.id), recipe_id=recipe_id))
-    db.session.commit()
+        db.session.commit()
+        return True
 
 def owner_public(recipe):
     u = User.query.get(recipe.get("user_id"))

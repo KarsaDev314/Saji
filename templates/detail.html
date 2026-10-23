@@ -21,16 +21,19 @@
                 <button type="submit" class="btn-outline {% if is_favorit %}aktif{% endif %}" style="display: flex; align-items: center; gap: 6px;">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="{% if is_favorit %}currentColor{% else %}none{% endif %}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                    </svg>
-                    Favorit
+                    </svg> Favorit
                 </button>
             </form>
             
             {% if boleh_edit %}
-            <a href="{{ url_for('edit', resep_id=resep.id) }}" class="btn-warning">✏️ Edit</a>
+            <a href="{{ url_for('edit', resep_id=resep.id) }}" class="btn-warning" style="display: flex; align-items: center; gap: 6px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg> Edit
+            </a>
             <form method="POST" action="{{ url_for('hapus', resep_id=resep.id) }}" onsubmit="bukaModal(event, this)">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <button type="submit" class="btn-danger">🗑 Hapus</button>
+                <button type="submit" class="btn-danger" style="display: flex; align-items: center; gap: 6px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> Hapus
+                </button>
             </form>
             {% endif %}
         </div>
@@ -76,12 +79,21 @@
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <div class="star-rating">
                             <input type="radio" id="star5" name="rating" value="5" {% if resep.rating == 5 %}checked{% endif %} />
-                            <label for="star5">★</label>
+                            <label for="star5" title="5 bintang">★</label>
+                            
                             <input type="radio" id="star4" name="rating" value="4" {% if resep.rating == 4 %}checked{% endif %} />
-                            <label for="star4">★</label>
+                            <label for="star4" title="4 bintang">★</label>
+                            
                             <input type="radio" id="star3" name="rating" value="3" {% if resep.rating == 3 %}checked{% endif %} />
-                            <label for="star3">★</label>
+                            <label for="star3" title="3 bintang">★</label>
+                            
+                            <input type="radio" id="star2" name="rating" value="2" {% if resep.rating == 2 %}checked{% endif %} />
+                            <label for="star2" title="2 bintang">★</label>
+                            
+                            <input type="radio" id="star1" name="rating" value="1" {% if resep.rating == 1 %}checked{% endif %} />
+                            <label for="star1" title="1 bintang">★</label>
                         </div>
+                        <input type="hidden" name="catatan" value="{{ resep.catatan or '' }}">
                     </form>
 
                     <!-- Garis Pemisah -->
@@ -129,7 +141,9 @@
     <!-- Modal Hapus -->
     <div id="modal-hapus" class="modal-overlay">
         <div class="modal-box">
-            <h3>🗑 Hapus Item Ini?</h3>
+            <h3 style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+    {{ icons.icon_trash() }} Hapus Item Ini?
+</h3>
             <p>Tindakan ini tidak bisa dibatalkan.</p>
             <div class="modal-aksi">
                 <button type="button" class="btn-outline" onclick="tutupModal()">Batal</button>

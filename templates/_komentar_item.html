@@ -1,8 +1,8 @@
 <div class="comment-item" id="k-{{ k.id }}">
     <div class="comment-header">
         <div style="display: flex; align-items: center; gap: 8px;">
-            {% if k.user_pic and k.user_pic != 'default_avatar.png' %}
-                <img src="{{ url_for('static', filename='uploads/profiles/' + k.user_pic) }}" alt="Avatar" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover;">
+            {% if k.profile_pic and k.profile_pic != 'default_avatar.png' %}
+                <img src="{{ url_for('static', filename='uploads/profiles/' + k.profile_pic) }}" alt="Avatar" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover;">
             {% else %}
                 <div style="width: 24px; height: 24px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: bold;">{{ k.username[0]|upper }}</div>
             {% endif %}
@@ -11,45 +11,50 @@
         <span class="comment-time">{{ k.waktu }}</span>
     </div>
     
-    <!-- LOGIKA EDIT: Kalau URL punya ?edit=id, tampilkan form -->
-    {% if request.args.get('edit') == k.id %}
-        <form method="POST" action="{{ url_for('edit_komentar', resep_id=resep.id, komentar_id=k.id) }}" class="form-edit-komentar">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <input type="text" name="teks" value="{{ k.teks }}" class="input-edit-teks" required>
-            <div class="edit-actions">
-                <button type="submit" class="btn-primary btn-sm">Simpan</button>
-                <a href="{{ url_for('detail', resep_id=resep.id) }}#k-{{ k.id }}" class="btn-text">Batal</a>
-            </div>
-        </form>
-    {% else %}
-        <p class="comment-text">{{ k.teks }}</p>
-    {% endif %}
+    <!-- TEKS KOMENTAR -->
+    <p class="comment-text" id="text-{{ k.id }}">{{ k.teks }}</p>
+
+    <!-- FORM EDIT (Tersembunyi by default) -->
+    <form method="POST" action="{{ url_for('edit_komentar', resep_id=resep.id, komentar_id=k.id) }}" class="ajax-edit-form" id="edit-form-{{ k.id }}" style="display: none; margin-bottom: 12px;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="text" name="teks" value="{{ k.teks }}" required style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-main); margin-bottom: 8px;">
+        <div style="display: flex; gap: 8px;">
+            <button type="submit" class="btn-primary btn-sm">Simpan</button>
+            <button type="button" class="btn-text" onclick="cancelEdit('{{ k.id }}')">Batal</button>
+        </div>
+    </form>
 
     <!-- AKSI: Balas, Edit, Hapus -->
     <div class="comment-actions">
         {% if current_user.is_authenticated %}
-            <button type="button" class="btn-text" onclick="toggleReply('{{ k.id }}')">↩ Balas</button>
+            <button type="button" class="btn-text" onclick="toggleReply('{{ k.id }}')" style="display: flex; align-items: center; gap: 4px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 17 4 12 9 7"></polyline><path d="M20 18v-2a4 4 0 0 0-4-4H4"></path></svg> Balas
+            </button>
             {% if boleh_moderasi_komentar(k, resep) %}
-                <a href="?edit={{ k.id }}#k-{{ k.id }}" class="btn-text">✏️ Edit</a>
-                <form method="POST" action="{{ url_for('hapus_komentar', resep_id=resep.id, komentar_id=k.id) }}" class="form-inline" onsubmit="bukaModal(event, this)">
+                <!-- INI TOMBOL EDIT BARU (BUKAN <a>) -->
+                <button type="button" class="btn-text" onclick="toggleEdit('{{ k.id }}')" style="display: flex; align-items: center; gap: 4px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg> Edit
+                </button>
+                
+                <form method="POST" action="{{ url_for('hapus_komentar', resep_id=resep.id, komentar_id=k.id) }}" class="form-inline ajax-delete-comment" style="margin: 0;">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <button type="submit" class="btn-text text-danger">🗑 Hapus</button>
+                    <button type="submit" class="btn-text text-danger" style="display: flex; align-items: center; gap: 4px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg> Hapus
+                    </button>
                 </form>
             {% endif %}
         {% endif %}
     </div>
 
-    <!-- FORM BALASAN (Tersembunyi, muncul pas klik Balas) -->
-    <div id="reply-form-{{ k.id }}" class="reply-form" style="display: none;">
-        <form method="POST" action="{{ url_for('tambah_komentar', resep_id=resep.id) }}" class="form-stack ajax-comment-form">
+    <div id="reply-form-{{ k.id }}" class="reply-form" style="display: none; margin-top: 12px;">
+        <form method="POST" action="{{ url_for('tambah_komentar', resep_id=resep.id) }}" class="ajax-comment-form">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="parent_id" value="{{ k.id }}">
-            <textarea name="teks" rows="2" placeholder="Balas @{{ k.username }}..." required class="input-textarea"></textarea>
-            <button type="submit" class="btn-primary btn-sm" style="align-self: flex-start;">Kirim</button>
+            <textarea name="teks" rows="2" placeholder="Balas @{{ k.username }}..." required class="input-textarea" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-main);"></textarea>
+            <button type="submit" class="btn-primary btn-sm" style="margin-top: 8px;">Kirim</button>
         </form>
     </div>
 
-    <!-- DAFTAR BALASAN (Recursive) -->
     {% if k.replies %}
     <div class="comment-replies">
         {% for rep in k.replies %}
