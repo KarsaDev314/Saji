@@ -1,28 +1,32 @@
-# Python
-__pycache__/
-*.py[cod]
-*.egg-info/
-.pytest_cache/
-
-# Virtual env
+# Environment & Python
 .venv/
 venv/
 env/
+__pycache__/
+*.pyc
+*.pyo
 
-# Data backup & arsip (jangan di-commit — berisi data user)
+# Database lokal
+saji.db
+*.sqlite3
+
+# File Upload User (Jangan masuk Git)
+static/uploads/
+
+# Testing
+.pytest_cache/
+test/
+tests/
+conftest.py
+
+# File Catatan Internal & Arsip
+ESTAFET_KARSA.md
 _archive/
-*.json.bak
-*.lama
+migrate_pfp.py
+*.txt
+!requirements.txt
 
-# OS
+# OS & Editor
 .DS_Store
 Thumbs.db
-
-# Editor
 .vscode/
-.idea/
-
-# Database
-*.db
-*.db-journal
-*.pre-sqlite.bak
