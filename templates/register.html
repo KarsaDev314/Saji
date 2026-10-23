@@ -1,37 +1,46 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Daftar - Panduan Memasak</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <a href="{{ url_for('index') }}" class="kembali">← Kembali ke daftar</a>
-    <h1>📝 Daftar Akun</h1>
+{% extends 'base.html' %}
 
-    {% if error %}
-    <p class="error">⚠️ {{ error }}</p>
-    {% endif %}
+{% block title %}Daftar - Saji{% endblock %}
 
-    <form method="POST" class="form-tambah" style="max-width:400px;">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <label>
-            Username (3-30 karakter, tanpa spasi)
-            <input type="text" name="username" required autofocus minlength="3" maxlength="30">
-        </label>
-        <label>
-            Password (minimal 6 karakter)
-            <input type="password" name="password" required minlength="6">
-        </label>
-        <label>
-            Ulangi Password
-            <input type="password" name="password2" required minlength="6">
-        </label>
-        <div class="aksi">
-            <button type="submit">✅ Buat Akun</button>
+{% block content %}
+<div class="auth-wrapper">
+    <!-- Sisi Kiri: Branding -->
+    <div class="auth-left">
+        <div class="brand-showcase">
+            <h1>🍳 Saji</h1>
+            <p>Mulai perjalanan kulinermu hari ini. Daftar gratis dan jadi bagian dari komunitas.</p>
         </div>
-    </form>
+    </div>
 
-    <p>Sudah punya akun? <a href="{{ url_for('login') }}">Login di sini</a></p>
-</body>
-</html>
+    <!-- Sisi Kanan: Form -->
+    <div class="auth-right">
+        <div class="auth-box">
+            <h2>Buat Akun Baru</h2>
+            
+            {% if error %}
+            <div class="alert-danger">{{ error }}</div>
+            {% endif %}
+
+            <form method="POST" class="auth-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                
+                <div class="input-group">
+                    <input type="text" name="username" placeholder="Username (tanpa spasi)" required maxlength="30">
+                </div>
+                <div class="input-group">
+                    <input type="password" name="password" placeholder="Password (min. 6 karakter)" required>
+                </div>
+                <div class="input-group">
+                    <input type="password" name="password2" placeholder="Konfirmasi Password" required>
+                </div>
+                
+                <button type="submit" class="btn-primary w-full">Daftar</button>
+            </form>
+
+            <div class="auth-footer">
+                Sudah punya akun? <a href="{{ url_for('login') }}">Log in di sini</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

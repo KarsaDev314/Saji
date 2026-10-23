@@ -1,39 +1,43 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Login - Panduan Memasak</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <a href="{{ url_for('index') }}" class="kembali">← Kembali ke daftar</a>
-    <h1>🔑 Login</h1>
+{% extends 'base.html' %}
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% for cat, msg in messages %}
-        <p class="flash flash-{{ cat }}">{{ msg }}</p>
-      {% endfor %}
-    {% endwith %}
+{% block title %}Login - Saji{% endblock %}
 
-    {% if error %}
-    <p class="error">⚠️ {{ error }}</p>
-    {% endif %}
-
-    <form method="POST" class="form-tambah" style="max-width:400px;">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <label>
-            Username
-            <input type="text" name="username" required autofocus>
-        </label>
-        <label>
-            Password
-            <input type="password" name="password" required>
-        </label>
-        <div class="aksi">
-            <button type="submit">🔑 Login</button>
+{% block content %}
+<div class="auth-wrapper">
+    <!-- Sisi Kiri: Branding -->
+    <div class="auth-left">
+        <div class="brand-showcase">
+            <h1>🍳 Saji</h1>
+            <p>Temukan inspirasi masakan, bagikan resep andalanmu, dan terhubung dengan pecinta kuliner lainnya.</p>
         </div>
-    </form>
+    </div>
 
-    <p>Belum punya akun? <a href="{{ url_for('register') }}">Daftar di sini</a></p>
-</body>
-</html>
+    <!-- Sisi Kanan: Form -->
+    <div class="auth-right">
+        <div class="auth-box">
+            <h2>Masuk ke Saji</h2>
+            
+            {% if error %}
+            <div class="alert-danger">{{ error }}</div>
+            {% endif %}
+
+            <form method="POST" class="auth-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                
+                <div class="input-group">
+                    <input type="text" name="username" placeholder="Username" required autofocus>
+                </div>
+                <div class="input-group">
+                    <input type="password" name="password" placeholder="Password" required>
+                </div>
+                
+                <button type="submit" class="btn-primary w-full">Log In</button>
+            </form>
+
+            <div class="auth-footer">
+                Belum punya akun? <a href="{{ url_for('register') }}">Daftar sekarang</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
