@@ -49,18 +49,37 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 3. FOLLOW
+        // 3. FOLLOW
     document.querySelectorAll('form[action^="/follow/"]').forEach(form => {
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = form.querySelector('button');
+            
+            // Cek kalau ini di halaman profil (ada ID follower-count)
             const followerCountSpan = document.getElementById('follower-count');
+            
             try {
                 const data = await fetchPost(form.action, new FormData(form));
                 if (data.status === 'ok') {
                     btn.classList.toggle('aktif', data.is_follow);
-                    btn.innerHTML = data.is_follow ? 'Berhenti Mengikuti' : 'Ikuti';
-                    if (followerCountSpan) followerCountSpan.textContent = data.follower_count;
+                    
+                    // Kalau di halaman profil, update teks tombolnya
+                    if (btn.classList.contains('btn-primary') || btn.classList.contains('btn-outline')) {
+                        btn.innerHTML = data.is_follow ? 'Mengikuti' : 'Ikuti';
+                        
+                        // Ganti style tombolnya
+                        if (data.is_follow) {
+                            btn.classList.add('btn-outline');
+                            btn.classList.remove('btn-primary');
+                        } else {
+                            btn.classList.add('btn-primary');
+                            btn.classList.remove('btn-outline');
+                        }
+                    }
+                    
+                    if (followerCountSpan) {
+                        followerCountSpan.textContent = data.follower_count;
+                    }
                 }
             } catch (err) { console.error("Gagal Follow:", err); }
         });

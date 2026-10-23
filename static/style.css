@@ -883,4 +883,113 @@ html { scroll-behavior: smooth; }
 .notif-time {
     font-size: 0.8rem;
     color: var(--text-muted);
+}/* ===== HALAMAN CARI TEMAN (USER GRID) ===== */
+.user-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+}
+
+.user-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.user-card-header:hover {
+    background: #fafbfc; /* Efek hover halus di seluruh kotak atas */
+}
+
+.user-card-header {
+    padding: 32px 24px 20px;
+    text-align: center;
+    flex: 1;
+    text-decoration: none; /* Hilangin garis bawah link */
+    color: inherit;        /* Warna teks ikut default */
+    display: block;        /* Biar bisa dibungkus penuh */
+    transition: background 0.2s;
+}
+
+.avatar-large {
+    width: 72px;
+    height: 72px;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 800;
+    margin: 0 auto 16px;
+    box-shadow: 0 4px 10px rgba(211, 84, 0, 0.3);
+}
+
+.user-card h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.25rem;
+    color: var(--text-main);
+    font-weight: 700;
+    transition: color 0.2s;
+}
+
+.user-card h3 a {
+    color: var(--text-main);
+    text-decoration: none;
+    font-weight: 700;
+}
+.user-card-header:hover h3 {
+    color: var(--primary); /* Nama jadi orange pas dihover */
+}
+
+
+.user-bio {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2; /* <-- TAMBAHIN INI */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.user-stats {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+.user-stats strong {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.user-card-action {
+    padding: 16px 24px;
+    background: #fafbfc;
+    border-top: 1px solid var(--border-color);
+}
+
+.user-card-action .form-follow {
+    margin: 0;
+}/* ===== HILANGIN GARIS BAWAH DI KARTU USER ===== */
+.user-card-header,
+.user-card-header:hover,
+.user-card-header:hover h3,
+.user-card-header:hover p,
+.user-card-header:hover strong {
+    text-decoration: none !important;
+}/* ===== HILANGIN GARIS BAWAH DI KARTU RESEP (INDEX) ===== */
+.card-body,
+.card-body:hover,
+.card-body:hover h3,
+.card-body:hover p,
+.card-body:hover .meta,
+.card-body:hover .author {
+    text-decoration: none !important;
 }
