@@ -5,66 +5,49 @@
 {% block content %}
     <a href="{{ url_for('index') }}" class="btn-back">← Kembali</a>
 
-    <div class="card">
-        <div class="profil-header">
-            <div>
-                <h1>@{{ user_pub.username }}</h1>
-                <p class="meta">{{ user_pub.bio or 'Belum ada bio.' }}</p>
-                <p class="meta">Bergabung sejak {{ user_pub.join_date }}</p>
-            </div>
-            {% if current_user.is_authenticated and user_id != user_idku %}
-            <form method="POST" action="{{ url_for('toggle_follow', target_id=user_id) }}">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <button type="submit" class="tombol-follow {% if sudah_follow %}aktif{% endif %}">
-                    {% if sudah_follow %}Mengikuti{% else %}Ikuti{% endif %}
-                </button>
-            </form>
-            {% elif current_user.is_authenticated and user_id == user_idku %}
-            <a href="{{ url_for('pengaturan') }}" class="btn-primary">⚙️ Edit Profil</a>
-            {% endif %}
+    <!-- Header Profil -->
+    <div class="profile-header-card">
+        <div class="profile-info">
+            <h1>@{{ user_pub.username }}</h1>
+            <p class="profile-bio">{{ user_pub.bio or 'Belum ada bio.' }}</p>
+            <p class="meta">Bergabung sejak {{ user_pub.join_date }}</p>
         </div>
-
-        <div class="stats-profil">
-            <a href="#resep-user" class="stat-item" style="text-decoration: none; color: inherit;">
-                <strong>{{ total_resep }}</strong>
-                <span>Resep</span>
-            </a>
-            
-            <details class="stat-item" style="position: relative; cursor: pointer;">
-                <summary style="list-style: none; outline: none;">
-                    <strong id="follower-count">{{ follower_count }}</strong>
-                    <span>Follower</span>
-                </summary>
-                <div style="position: absolute; top: 100%; left: 0; background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 100; min-width: 150px; text-align: left;">
-                    {% if followers_list %}
-                        {% for u in followers_list %}
-                            <a href="{{ url_for('profil', username=u.username) }}" style="display: block; padding: 5px 0; color: #2d3748; text-decoration: none; font-weight: normal;">@{{ u.username }}</a>
-                        {% endfor %}
-                    {% else %}
-                        <span style="color: #718096; font-size: 0.9em;">Belum ada</span>
-                    {% endif %}
-                </div>
-            </details>
-            
-            <details class="stat-item" style="position: relative; cursor: pointer;">
-                <summary style="list-style: none; outline: none;">
-                    <strong>{{ following_count }}</strong>
-                    <span>Following</span>
-                </summary>
-                <div style="position: absolute; top: 100%; left: 0; background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 100; min-width: 150px; text-align: left;">
-                    {% if following_users %}
-                        {% for u in following_users %}
-                            <a href="{{ url_for('profil', username=u.username) }}" style="display: block; padding: 5px 0; color: #2d3748; text-decoration: none; font-weight: normal;">@{{ u.username }}</a>
-                        {% endfor %}
-                    {% else %}
-                        <span style="color: #718096; font-size: 0.9em;">Belum mengikuti siapapun</span>
-                    {% endif %}
-                </div>
-            </details>
+        
+        <div class="profile-actions">
+            {% if current_user.is_authenticated and user_id != user_idku %}
+                <form method="POST" action="{{ url_for('toggle_follow', target_id=user_id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn-primary {% if sudah_follow %}btn-outline{% endif %}">
+                        {% if sudah_follow %}Mengikuti{% else %}Ikuti{% endif %}
+                    </button>
+                </form>
+            {% elif current_user.is_authenticated and user_id == user_idku %}
+                <a href="{{ url_for('pengaturan') }}" class="btn-outline">⚙️ Edit Profil</a>
+            {% endif %}
         </div>
     </div>
 
-    <h2 id="resep-user" style="margin-top: 30px;">Resep dari @{{ user_pub.username }}</h2>
+    <!-- Statistik (Sekarang pakai tombol buat buka Modal) -->
+    <div class="profile-stats">
+        <a href="#resep-user" class="stat-item">
+            <strong>{{ total_resep }}</strong>
+            <span>Resep</span>
+        </a>
+        
+        <button class="stat-item" onclick="bukaModalFollow('follower')">
+            <strong id="follower-count">{{ follower_count }}</strong>
+            <span>Follower</span>
+        </button>
+
+        <button class="stat-item" onclick="bukaModalFollow('following')">
+            <strong>{{ following_count }}</strong>
+            <span>Following</span>
+        </button>
+    </div>
+
+    <!-- Grid Resep User -->
+    <h2 class="section-title" id="resep-user">Resep dari @{{ user_pub.username }}</h2>
+    
     {% if resep_list %}
         <div class="recipe-grid">
             {% for resep in resep_list %}
@@ -77,6 +60,69 @@
             {% endfor %}
         </div>
     {% else %}
-        <p class="kosong">Belum ada resep.</p>
+        <div class="empty-state">
+            <p>📭 Belum ada resep yang dipublikasikan.</p>
+        </div>
     {% endif %}
+
+    <!-- MODAL FOLLOWERS / FOLLOWING -->
+    <div id="modal-follow" class="modal-overlay">
+        <div class="modal-box modal-follow-box">
+            <div class="modal-header">
+                <h3 id="modal-follow-title">Judul</h3>
+                <button type="button" class="btn-close" onclick="tutupModalFollow()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="list-followers" class="modal-list">
+                    {% for u in followers_list %}
+                        <a href="{{ url_for('profil', username=u.username) }}" class="modal-user-link">
+                            <div class="avatar-placeholder">{{ u.username[0]|upper }}</div>
+                            @{{ u.username }}
+                        </a>
+                    {% else %}
+                        <p class="empty-state-text">Belum ada follower.</p>
+                    {% endfor %}
+                </div>
+                <div id="list-following" class="modal-list" style="display: none;">
+                    {% for u in following_users %}
+                        <a href="{{ url_for('profil', username=u.username) }}" class="modal-user-link">
+                            <div class="avatar-placeholder">{{ u.username[0]|upper }}</div>
+                            @{{ u.username }}
+                        </a>
+                    {% else %}
+                        <p class="empty-state-text">Belum mengikuti siapapun.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function bukaModalFollow(type) {
+        document.getElementById('modal-follow').style.display = 'flex';
+        if (type === 'follower') {
+            document.getElementById('modal-follow-title').innerText = 'Follower';
+            document.getElementById('list-followers').style.display = 'flex';
+            document.getElementById('list-following').style.display = 'none';
+        } else {
+            document.getElementById('modal-follow-title').innerText = 'Following';
+            document.getElementById('list-followers').style.display = 'none';
+            document.getElementById('list-following').style.display = 'flex';
+        }
+    }
+
+    function tutupModalFollow() {
+        document.getElementById('modal-follow').style.display = 'none';
+    }
+
+    // Tutup modal kalau klik di luar kotak
+    window.onclick = function(event) {
+        const modal = document.getElementById('modal-follow');
+        if (event.target == modal) {
+            tutupModalFollow();
+        }
+    }
+</script>
 {% endblock %}

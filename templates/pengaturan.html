@@ -1,40 +1,38 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Pengaturan Profil - Panduan Memasak</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <a href="{{ url_for('profil', username=current_user.username) }}" class="kembali">← Kembali ke profil</a>
-    <h1>⚙️ Pengaturan Profil</h1>
+{% extends 'base.html' %}
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% for cat, msg in messages %}
-        <p class="flash flash-{{ cat }}">{{ msg }}</p>
-      {% endfor %}
-    {% endwith %}
+{% block title %}Pengaturan - Saji{% endblock %}
 
-    {% if error %}
-    <p class="error">⚠️ {{ error }}</p>
-    {% endif %}
+{% block content %}
+    <a href="{{ url_for('profil', username=current_user.username) }}" class="btn-back">← Kembali ke Profil</a>
 
-    <form method="POST" class="form-tambah" style="max-width:500px;">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <label>
-            Username (3-30 karakter, tanpa spasi)
-            <input type="text" name="username" required minlength="3" maxlength="30" value="{{ current_user.username }}">
-        </label>
+    <div class="form-header">
+        <h1>Pengaturan Profil</h1>
+        <p>Perbarui informasi publik kamu di Saji.</p>
+    </div>
 
-        <label>
-            Bio (maksimal 300 karakter)
-            <textarea name="bio" rows="4" maxlength="300" placeholder="Ceritakan sedikit tentang dirimu atau gaya memasakmu...">{{ current_user.bio }}</textarea>
-        </label>
+    <div class="form-container">
+        <form method="POST" class="form-card">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            
+            {% if error %}
+            <div class="alert-danger">{{ error }}</div>
+            {% endif %}
 
-        <div class="aksi">
-            <button type="submit">💾 Simpan Perubahan</button>
-            <a href="{{ url_for('profil', username=current_user.username) }}" class="batal">Batal</a>
-        </div>
-    </form>
-</body>
-</html>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" name="username" value="{{ current_user.username }}" required maxlength="30">
+                <span class="text-muted">Username unik kamu. Tidak boleh ada spasi.</span>
+            </div>
+
+            <div class="form-group">
+                <label>Bio</label>
+                <textarea name="bio" rows="4" placeholder="Ceritakan sedikit tentang dirimu..." maxlength="300">{{ current_user.bio or '' }}</textarea>
+                <span class="text-muted">Maksimal 300 karakter.</span>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-primary btn-lg">💾 Simpan Perubahan</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}
