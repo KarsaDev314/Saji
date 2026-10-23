@@ -1,16 +1,51 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ kode if kode else "404" }} - Panduan Memasak</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <div class="halaman-error">
-        <div class="kode-error">{{ kode if kode else "404" }}</div>
-        <h1>{% if kode == 403 %}Akses Ditolak{% elif kode == 500 %}Ada Masalah di Server{% else %}Tidak Ditemukan{% endif %}</h1>
-        <p>{{ pesan if pesan else "Resep yang kamu cari tidak ada, atau sudah dihapus." }}</p>
-        <a href="{{ url_for('index') }}" class="tombol-kembali">← Kembali ke Daftar</a>
+{% extends 'base.html' %}
+
+{% block title %}{% if kode == 500 %}Waduh, Error!{% else %}Halaman Hilang!{% endif %} - Saji{% endblock %}
+
+{% block content %}
+    <div class="error-page-wrapper">
+        <div class="error-card">
+            <!-- Ikon Lucu -->
+            <div class="error-icon">
+                {% if kode == 500 %}
+                🍳💥
+                {% else %}
+                🍽️💨
+                {% endif %}
+            </div>
+
+            <!-- Kode Error -->
+            <h1 class="error-code">
+                {% if kode %}{{ kode }}{% else %}404{% endif %}
+            </h1>
+
+            <!-- Pesan -->
+            <h2 class="error-title">
+                {% if kode == 500 %}
+                Dapur Kami Kebakaran!
+                {% elif kode == 403 %}
+                Area Terlarang!
+                {% else %}
+                Resepnya Kabur!
+                {% endif %}
+            </h2>
+            
+            <p class="error-desc">
+                {% if pesan %}
+                    {{ pesan }}
+                {% elif kode == 500 %}
+                    Ada yang salah dengan resep di dapur kami. Koki (developer) sedang memperbaikinya.
+                {% elif kode == 403 %}
+                    Kamu tidak punya izin untuk masuk ke dapur ini. Kembalilah ke area aman.
+                {% else %}
+                    Sepertinya bahan yang kamu cari sudah dimakan kucing, atau halamannya pindah ke dapur lain.
+                {% endif %}
+            </p>
+
+            <!-- Tombol Kembali -->
+            <a href="{{ url_for('index') }}" class="btn-primary btn-lg" style="text-decoration: none; display: inline-block;">
+                🏠 Balik ke Beranda
+            </a>
+        </div>
     </div>
-</body>
-</html>
+{% endblock %}
