@@ -16,15 +16,16 @@
         </div>
         
         <div class="header-actions">
-            <!-- Favorit Selalu Muncul -->
             <form method="POST" action="{{ url_for('toggle_favorit', resep_id=resep.id) }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <button type="submit" class="btn-outline {% if is_favorit %}aktif{% endif %}">
-                    {% if is_favorit %}⭐ Favorit{% else %}☆ Favorit{% endif %}
+                <button type="submit" class="btn-outline {% if is_favorit %}aktif{% endif %}" style="display: flex; align-items: center; gap: 6px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="{% if is_favorit %}currentColor{% else %}none{% endif %}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                    Favorit
                 </button>
             </form>
             
-            <!-- Edit & Hapus Cuma Muncul Kalau Berhak -->
             {% if boleh_edit %}
             <a href="{{ url_for('edit', resep_id=resep.id) }}" class="btn-warning">✏️ Edit</a>
             <form method="POST" action="{{ url_for('hapus', resep_id=resep.id) }}" onsubmit="bukaModal(event, this)">
@@ -35,13 +36,16 @@
         </div>
     </div>
 
-    <!-- KOTAK UTAMA (Bahan, Langkah, Like & Rating) -->
+    <!-- KOTAK UTAMA -->
     <div class="detail-container">
-        
         <div class="card main-recipe-card">
+            
             <!-- Bahan -->
             <div class="recipe-section">
-                <h2>🧺 Bahan-bahan</h2>
+                <h2 style="display: flex; align-items: center; gap: 8px;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                    Bahan-bahan
+                </h2>
                 <ul class="bahan">
                     {% for b in resep.bahan %}<li>{{ b }}</li>{% endfor %}
                 </ul>
@@ -51,7 +55,10 @@
 
             <!-- Langkah -->
             <div class="recipe-section">
-                <h2>👨‍🍳 Langkah Memasak</h2>
+                <h2 style="display: flex; align-items: center; gap: 8px;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);"><path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6Z"></path><line x1="6" y1="17" x2="18" y2="17"></line></svg>
+                    Langkah Memasak
+                </h2>
                 <ol class="langkah">
                     {% for l in resep.langkah %}<li>{{ l }}</li>{% endfor %}
                 </ol>
@@ -59,47 +66,49 @@
 
             <hr class="section-divider">
 
-            <!-- Like & Rating (Pojok Kanan Bawah) -->
+            <!-- Like & Rating -->
             <div class="interaction-bar">
+                {% if current_user.is_authenticated %}
                 <div class="interaction-group">
-                    {% if current_user.is_authenticated %}
-                        <!-- Form Rating (Bintang) -->
-                        <form method="POST" action="{{ url_for('simpan_rating', resep_id=resep.id) }}" class="inline-rating-form ajax-rating-form">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                            <div class="star-rating">
-                                <input type="radio" id="star5" name="rating" value="5" {% if resep.rating == 5 %}checked{% endif %} />
-                                <label for="star5">★</label>
-                                <input type="radio" id="star4" name="rating" value="4" {% if resep.rating == 4 %}checked{% endif %} />
-                                <label for="star4">★</label>
-                                <input type="radio" id="star3" name="rating" value="3" {% if resep.rating == 3 %}checked{% endif %} />
-                                <label for="star3">★</label>
-                                <input type="radio" id="star2" name="rating" value="2" {% if resep.rating == 2 %}checked{% endif %} />
-                                <label for="star2">★</label>
-                                <input type="radio" id="star1" name="rating" value="1" {% if resep.rating == 1 %}checked{% endif %} />
-                                <label for="star1">★</label>
-                            </div>
-                        </form>
+                    
+                    <!-- Form Rating Bintang -->
+                    <form method="POST" action="{{ url_for('simpan_rating', resep_id=resep.id) }}" class="inline-rating-form ajax-rating-form">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="star-rating">
+                            <input type="radio" id="star5" name="rating" value="5" {% if resep.rating == 5 %}checked{% endif %} />
+                            <label for="star5">★</label>
+                            <input type="radio" id="star4" name="rating" value="4" {% if resep.rating == 4 %}checked{% endif %} />
+                            <label for="star4">★</label>
+                            <input type="radio" id="star3" name="rating" value="3" {% if resep.rating == 3 %}checked{% endif %} />
+                            <label for="star3">★</label>
+                        </div>
+                    </form>
 
-                        <!-- Form Like -->
-                        {% set likes = resep.get('likes', []) %}
-                        <form method="POST" action="{{ url_for('toggle_like', resep_id=resep.id) }}" class="inline-like-form">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                            <button type="submit" class="btn-like-sm {% if current_user.id|int in likes %}aktif{% endif %}">
-                                ❤️ {{ likes|length }} Suka
-                            </button>
-                        </form>
-                    {% else %}
-                        <!-- Tampilan Guest (Kalau belum login) -->
-                        <a href="{{ url_for('login') }}" class="btn-like-sm" style="text-decoration:none;">❤️ {{ resep.get('likes', [])|length }} Suka</a>
-                        <a href="{{ url_for('login') }}" class="btn-text" style="text-decoration:none;">⭐ Login untuk rating</a>
-                    {% endif %}
+                    <!-- Garis Pemisah -->
+                    <div style="width: 1px; height: 24px; background: var(--border-color); margin: 0 8px;"></div>
+
+                    <!-- Form Like -->
+                    {% set likes = resep.get('likes', []) %}
+                    <form method="POST" action="{{ url_for('toggle_like', resep_id=resep.id) }}" class="inline-like-form">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn-like-sm {% if current_user.id|int in likes %}aktif{% endif %}" style="display: flex; align-items: center; gap: 6px;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="{% if current_user.id|int in likes %}currentColor{% else %}none{% endif %}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                            </svg>
+                            {{ likes|length }} Suka
+                        </button>
+                    </form>
                 </div>
+                {% endif %}
             </div>
         </div>
 
-        <!-- KOMENTAR -->
+        <!-- Komentar -->
         <div class="card full-width-comment" id="komentar">
-            <h2>💬 Komentar ({{ resep.get('comments', [])|length }})</h2>
+            <h2 style="display: flex; align-items: center; gap: 8px;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--primary);"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                Komentar ({{ resep.get('comments', [])|length }})
+            </h2>
             
             {% if current_user.is_authenticated %}
             <form method="POST" action="{{ url_for('tambah_komentar', resep_id=resep.id) }}" class="form-stack ajax-comment-form">
@@ -107,10 +116,6 @@
                 <textarea name="teks" rows="2" placeholder="Tulis komentar..." maxlength="500" required class="input-textarea"></textarea>
                 <button type="submit" class="btn-primary" style="align-self: flex-start;">Kirim</button>
             </form>
-            {% else %}
-            <div style="text-align: center; padding: 20px; background: #fafafa; border-radius: 8px; margin-bottom: 20px; border: 1px dashed #e2e8f0;">
-                <p class="meta">Silakan <a href="{{ url_for('login') }}" style="font-weight: bold; color: var(--primary);">login</a> untuk ikut berkomentar.</p>
-            </div>
             {% endif %}
 
             <div class="comment-list">

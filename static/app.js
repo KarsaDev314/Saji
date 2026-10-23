@@ -1,4 +1,50 @@
 document.addEventListener('DOMContentLoaded', () => {
+
+    // ==========================================
+    // 1. SETTINGS DROPDOWN & DARK MODE (GLOBAL)
+    // ==========================================
+    const themeCheckbox = document.getElementById('theme-checkbox');
+    
+    // Fungsi buka/tutup menu (dipanggil dari onclick di HTML)
+    window.toggleSettingsMenu = function(e) {
+        if (e) { e.preventDefault(); e.stopPropagation(); }
+        const menu = document.getElementById('settings-menu');
+        if (menu) menu.classList.toggle('show');
+    };
+
+    // Tutup menu kalau klik di luar area
+    document.addEventListener('click', function(e) {
+        const menu = document.getElementById('settings-menu');
+        const btn = document.getElementById('settings-btn');
+        if (menu && menu.classList.contains('show')) {
+            if (!menu.contains(e.target) && (!btn || !btn.contains(e.target))) {
+                menu.classList.remove('show');
+            }
+        }
+    });
+
+    // Logic Dark Mode (Cek apakah elemen ada sebelum jalan)
+    if (themeCheckbox) {
+        // Sinkronisasi status checkbox sama localStorage
+        if (localStorage.getItem('saji_theme') === 'dark') {
+            themeCheckbox.checked = true;
+        }
+
+        // Event listener pas digeser
+        themeCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('saji_theme', 'dark');
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+                localStorage.setItem('saji_theme', 'light');
+            }
+        });
+    }
+
+    // ==========================================
+    // 2. AJAX & FITUR INTERAKTIF (PAGE SPECIFIC)
+    // ==========================================
     const fetchPost = async (url, formData) => {
         const response = await fetch(url, {
             method: 'POST',
@@ -8,27 +54,24 @@ document.addEventListener('DOMContentLoaded', () => {
         return response.json();
     };
 
-    // 1. LIKE
+    // --- LIKE ---
     document.querySelectorAll('form[action*="/like"]').forEach(form => {
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = form.querySelector('button');
-            
             try {
                 const data = await fetchPost(form.action, new FormData(form));
                 if (data.status === 'ok') {
                     btn.classList.toggle('aktif', data.is_liked);
-                    if (data.is_liked) {
-                        btn.innerHTML = `❤️ ${data.likes_count} Suka`;
-                    } else {
-                        btn.innerHTML = `🤍 ${data.likes_count} Suka`;
-                    }
+                    btn.innerHTML = data.is_liked 
+                        ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg> ${data.likes_count} Suka`
+                        : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg> ${data.likes_count} Suka`;
                 }
             } catch (err) { console.error("Gagal Like:", err); }
         });
     });
 
-    // 2. FAVORIT
+    // --- FAVORIT ---
     document.querySelectorAll('form[action*="/favorit"]').forEach(form => {
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -37,8 +80,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await fetchPost(form.action, new FormData(form));
                 if (data.status === 'ok') {
                     btn.classList.toggle('aktif', data.is_favorit);
-                    
-                    // BENERIN DI SINI: Cek apakah tombolnya ikon (beranda) atau teks (detail)
                     if (btn.classList.contains('btn-icon')) {
                         btn.innerHTML = data.is_favorit ? '★' : '☆';
                     } else {
@@ -49,43 +90,24 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-        // 3. FOLLOW
+    // --- FOLLOW ---
     document.querySelectorAll('form[action^="/follow/"]').forEach(form => {
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = form.querySelector('button');
-            
-            // Cek kalau ini di halaman profil (ada ID follower-count)
             const followerCountSpan = document.getElementById('follower-count');
-            
             try {
                 const data = await fetchPost(form.action, new FormData(form));
                 if (data.status === 'ok') {
                     btn.classList.toggle('aktif', data.is_follow);
-                    
-                    // Kalau di halaman profil, update teks tombolnya
-                    if (btn.classList.contains('btn-primary') || btn.classList.contains('btn-outline')) {
-                        btn.innerHTML = data.is_follow ? 'Mengikuti' : 'Ikuti';
-                        
-                        // Ganti style tombolnya
-                        if (data.is_follow) {
-                            btn.classList.add('btn-outline');
-                            btn.classList.remove('btn-primary');
-                        } else {
-                            btn.classList.add('btn-primary');
-                            btn.classList.remove('btn-outline');
-                        }
-                    }
-                    
-                    if (followerCountSpan) {
-                        followerCountSpan.textContent = data.follower_count;
-                    }
+                    btn.innerHTML = data.is_follow ? 'Berhenti Mengikuti' : 'Ikuti';
+                    if (followerCountSpan) followerCountSpan.textContent = data.follower_count;
                 }
             } catch (err) { console.error("Gagal Follow:", err); }
         });
     });
 
-    // 4. KOMENTAR (Kirim & Balas)
+    // --- KOMENTAR ---
     document.addEventListener('submit', async (e) => {
         if (e.target.matches('.ajax-comment-form')) {
             e.preventDefault();
@@ -126,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 5. RATING (Auto-save saat bintang diklik)
+    // --- RATING ---
     document.querySelectorAll('.ajax-rating-form input[type="radio"]').forEach(radio => {
         radio.addEventListener('change', async (e) => {
             const form = e.target.closest('form');
@@ -143,56 +165,47 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
-});    // 6. CUSTOM DROPDOWN KATEGORI
-    const dropdown = document.getElementById('category-dropdown');
-    const dropdownBtn = document.getElementById('category-btn');
-    const dropdownMenu = document.getElementById('category-menu');
-    const categoryValue = document.getElementById('category-value');
-    const categoryLabel = document.getElementById('category-label');
 
-    if (dropdownBtn) {
-        // Toggle buka/tutup
+    // ==========================================
+    // 3. CUSTOM SEARCH & DROPDOWN (INDEX ONLY)
+    // ==========================================
+    const dropdown = document.getElementById('category-dropdown');
+    if (dropdown) {
+        const dropdownBtn = document.getElementById('category-btn');
+        const dropdownMenu = document.getElementById('category-menu');
+        const categoryValue = document.getElementById('category-value');
+        const categoryLabel = document.getElementById('category-label');
+
         dropdownBtn.addEventListener('click', () => {
             dropdown.classList.toggle('open');
-            document.getElementById('search-history').style.display = 'none'; // Tutup history kalau dropdown buka
+            document.getElementById('search-history').style.display = 'none';
         });
 
-        // Pilih item
         dropdownMenu.querySelectorAll('li').forEach(item => {
             item.addEventListener('click', () => {
                 const val = item.getAttribute('data-value');
                 const text = item.innerText;
-                
                 categoryValue.value = val;
                 categoryLabel.innerText = text;
-                
-                // Update class active
                 dropdownMenu.querySelectorAll('li').forEach(li => li.classList.remove('active'));
                 item.classList.add('active');
-                
                 dropdown.classList.remove('open');
             });
         });
 
-        // Tutup kalau klik di luar
         document.addEventListener('click', (e) => {
-            if (!dropdown.contains(e.target)) {
-                dropdown.classList.remove('open');
-            }
+            if (!dropdown.contains(e.target)) dropdown.classList.remove('open');
         });
     }
 
-    // 7. FITUR HISTORY SEARCH (LOCALSTORAGE)
+    // Search History
     const searchInput = document.getElementById('search-input');
-    const historyBox = document.getElementById('search-history');
-    const historyList = document.getElementById('history-list');
-    const clearHistoryBtn = document.getElementById('clear-history');
-
     if (searchInput) {
-        // Ambil history dari localStorage
+        const historyBox = document.getElementById('search-history');
+        const historyList = document.getElementById('history-list');
+        const clearHistoryBtn = document.getElementById('clear-history');
         let searchHistory = JSON.parse(localStorage.getItem('saji_search_history')) || [];
 
-        // Tampilkan history
         const renderHistory = () => {
             if (searchHistory.length === 0) {
                 historyBox.style.display = 'none';
@@ -211,28 +224,24 @@ document.addEventListener('DOMContentLoaded', () => {
             historyBox.style.display = 'block';
         };
 
-        // Event saat input di-fokus
         searchInput.addEventListener('focus', () => {
             renderHistory();
-            if (dropdown) dropdown.classList.remove('open'); // Tutup dropdown kalau input fokus
+            if (dropdown) dropdown.classList.remove('open');
         });
 
-        // Event saat ngetik (tutup history biar gak nutupin)
         searchInput.addEventListener('input', () => {
             historyBox.style.display = 'none';
         });
 
-        // Simpan history saat form disubmit
         document.getElementById('search-form').addEventListener('submit', () => {
             const val = searchInput.value.trim();
             if (val && !searchHistory.includes(val)) {
-                searchHistory.unshift(val); // Taruh paling atas
-                searchHistory = searchHistory.slice(0, 5); // Maksimal 5
+                searchHistory.unshift(val);
+                searchHistory = searchHistory.slice(0, 5);
                 localStorage.setItem('saji_search_history', JSON.stringify(searchHistory));
             }
         });
 
-        // Hapus history
         clearHistoryBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             searchHistory = [];
@@ -240,55 +249,10 @@ document.addEventListener('DOMContentLoaded', () => {
             renderHistory();
         });
 
-        // Tutup history kalau klik di luar
         document.addEventListener('click', (e) => {
             if (!searchInput.contains(e.target) && !historyBox.contains(e.target)) {
                 historyBox.style.display = 'none';
             }
         });
-    }        // Tambahan: Biar bisa diakses pakai keyboard (Enter / Spasi)
-        dropdownMenu.querySelectorAll('li').forEach((item, index) => {
-            item.setAttribute('tabindex', '0'); // Biar bisa di-focus
-            
-            item.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    item.click(); // Panggil fungsi klik
-                }
-            });
-        });    
-        
-                // 8. SETTINGS DROPDOWN & DARK MODE (ROBUST VERSION)
-    const themeCheckbox = document.getElementById('theme-checkbox');
-
-    // Event Delegation buat tombol gear (Anti Gagal)
-    document.addEventListener('click', function(e) {
-        const settingsBtn = e.target.closest('#settings-btn');
-        const settingsMenu = document.getElementById('settings-menu');
-
-        if (settingsBtn && settingsMenu) {
-            e.preventDefault();
-            e.stopPropagation();
-            settingsMenu.classList.toggle('show');
-        } else if (settingsMenu && !settingsMenu.contains(e.target)) {
-            // Tutup menu kalau klik di luar
-            settingsMenu.classList.remove('show');
-        }
-    });
-
-    // Logic Dark Mode (Sinkronisasi dengan localStorage)
-    if (themeCheckbox) {
-        if (localStorage.getItem('saji_theme') === 'dark') {
-            themeCheckbox.checked = true;
-        }
-
-        themeCheckbox.addEventListener('change', function() {
-            if (this.checked) {
-                document.documentElement.setAttribute('data-theme', 'dark');
-                localStorage.setItem('saji_theme', 'dark');
-            } else {
-                document.documentElement.removeAttribute('data-theme');
-                localStorage.setItem('saji_theme', 'light');
-            }
-        });
     }
+});

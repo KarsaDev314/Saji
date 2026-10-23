@@ -11,9 +11,18 @@
     {% if current_user.is_authenticated %}
     <div class="mode-switcher-wrapper">
         <div class="mode-switcher">
-            <a href="{{ url_for('index', mode='saya') }}" class="{% if mode == 'saya' %}aktif{% endif %}">👤 Resep Saya</a>
-            <a href="{{ url_for('index', mode='feed') }}" class="{% if mode == 'feed' %}aktif{% endif %}">📰 Feed</a>
-            <a href="{{ url_for('index', mode='explore') }}" class="{% if mode == 'explore' %}aktif{% endif %}">🌏 Explore</a>
+            <a href="{{ url_for('index', mode='saya') }}" class="{% if mode == 'saya' %}aktif{% endif %}">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                Resep Saya
+            </a>
+            <a href="{{ url_for('index', mode='feed') }}" class="{% if mode == 'feed' %}aktif{% endif %}">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                Feed
+            </a>
+            <a href="{{ url_for('index', mode='explore') }}" class="{% if mode == 'explore' %}aktif{% endif %}">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
+                Explore
+            </a>
         </div>
     </div>
     {% endif %}
@@ -24,7 +33,6 @@
         <div class="filter-inputs">
             <div class="search-wrapper">
                 <input type="text" name="q" id="search-input" placeholder="Cari resep atau bahan..." value="{{ kata_kunci }}" class="input-search" autocomplete="off">
-                <!-- Kotak History Search -->
                 <div id="search-history" class="search-history-box" style="display: none;">
                     <div class="history-header">
                         <span>Pencarian Terakhir</span>
@@ -34,7 +42,6 @@
                 </div>
             </div>
 
-            <!-- Custom Dropdown Kategori -->
             <div class="custom-dropdown" id="category-dropdown">
                 <input type="hidden" name="kategori" id="category-value" value="{{ kategori_aktif }}">
                 <button type="button" class="dropdown-btn" id="category-btn">
@@ -49,14 +56,20 @@
                 </ul>
             </div>
 
-            <button type="submit" class="btn-primary">🔍 Cari</button>
+            <button type="submit" class="btn-primary" style="display: flex; align-items: center; gap: 8px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                Cari
+            </button>
         </div>
         
         <div class="filter-checkbox">
             <label class="toggle-label">
                 <input type="checkbox" name="favorit" value="1" {% if hanya_favorit %}checked{% endif %}>
                 <span class="toggle-switch"></span>
-                <span class="toggle-text">⭐ Hanya Favorit</span>
+                <span class="toggle-text" style="display: flex; align-items: center; gap: 4px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--warning);"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    Hanya Favorit
+                </span>
             </label>
             {% if hanya_favorit %}
             <a href="{{ url_for('index', mode=mode) }}" class="reset-link">✕ Reset</a>
@@ -82,23 +95,29 @@
                 
                 <form method="POST" action="{{ url_for('toggle_favorit', resep_id=resep.id) }}" class="card-action">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <button type="submit" class="btn-icon {% if resep.id in favorit_ids %}aktif{% endif %}">
-                        {% if resep.id in favorit_ids %}★{% else %}☆{% endif %}
+                    <button type="submit" class="btn-icon {% if resep.id in favorit_ids %}aktif{% endif %}" style="font-size: 1.2rem;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="{% if resep.id in favorit_ids %}currentColor{% else %}none{% endif %}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                        </svg>
                     </button>
                 </form>
             </div>
             {% endfor %}
         </div>
     {% else %}
-        <div class="empty-state">
-            <p>📭 Belum ada resep di sini.</p>
+                <div class="empty-state">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 16px; color: var(--border-color);">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+            <p>Belum ada resep di sini.</p>
         </div>
     {% endif %}
 
-    <!-- FAB: Floating Action Button -->
     {% if current_user.is_authenticated %}
     <a href="{{ url_for('tambah') }}" class="fab-button" title="Tambah Resep Baru">
-        +
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
     </a>
     {% endif %}
 {% endblock %}
