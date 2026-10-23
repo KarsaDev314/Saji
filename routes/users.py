@@ -1,6 +1,6 @@
 import os
 import uuid
-from flask import render_template, request, redirect, url_for, abort, flash, current_app
+from flask import render_template, request, redirect, url_for, abort, flash, current_app, jsonify
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
 from services import user_service, recipe_service
@@ -38,7 +38,18 @@ def register(app):
     @login_required
     def toggle_follow(target_id):
         res = user_service.toggle_follow(target_id)
-        if res: flash(*res)
+        
+        # --- LOGIKA AJAX (Biar tombol gak reload) ---
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            if res.get("status") == "error":
+                return jsonify(res), 400
+            return jsonify(res)
+            
+        # Fallback redirect biasa
+        if res.get("status") == "error":
+            flash(res["message"], "info")
+        else:
+            flash("Berhasil.", "sukses")
         return redirect(request.referrer or url_for("index"))
 
     @app.route("/pengaturan", methods=["GET", "POST"])
@@ -71,7 +82,7 @@ def register(app):
                 os.makedirs(os.path.dirname(filepath), exist_ok=True)
                 file.save(filepath)
 
-                # Hapus foto lama kalau bukan default
+                # Hapus foto lama
                 old_pic = user_data.get("profile_pic")
                 if old_pic and old_pic != "default_avatar.png":
                     old_filepath = os.path.join(current_app.root_path, config.UPLOAD_FOLDER, old_pic)

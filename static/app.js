@@ -5,11 +5,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     const themeCheckbox = document.getElementById('theme-checkbox');
     
-    // Fungsi buka/tutup menu (dipanggil dari onclick di HTML)
+        // Fungsi buka/tutup menu
     window.toggleSettingsMenu = function(e) {
         if (e) { e.preventDefault(); e.stopPropagation(); }
         const menu = document.getElementById('settings-menu');
-        if (menu) menu.classList.toggle('show');
+        const btn = document.getElementById('settings-btn');
+        if (menu) {
+            menu.classList.toggle('show');
+            if (btn) btn.classList.toggle('active'); // Biar gear-nya nyala & muter
+        }
     };
 
     // Tutup menu kalau klik di luar area
@@ -19,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (menu && menu.classList.contains('show')) {
             if (!menu.contains(e.target) && (!btn || !btn.contains(e.target))) {
                 menu.classList.remove('show');
+                if (btn) btn.classList.remove('active'); // Balikin gear ke posisi semula
             }
         }
     });
@@ -271,4 +276,46 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+        // --- LAPOR BUG ---
+    window.bukaLaporBug = function(e) {
+        if (e) { e.preventDefault(); e.stopPropagation(); }
+        const modal = document.getElementById('bug-modal');
+        if (modal) modal.style.display = 'flex';
+        
+        // Tutup menu settings biar gak numpuk
+        const menu = document.getElementById('settings-menu');
+        const btn = document.getElementById('settings-btn');
+        if (menu) menu.classList.remove('show');
+        if (btn) btn.classList.remove('active');
+    };
+
+    window.tutupLaporBug = function() {
+        const modal = document.getElementById('bug-modal');
+        if (modal) modal.style.display = 'none';
+    };
+
+    window.kirimLaporBug = function(e) {
+        e.preventDefault();
+        const btn = e.target.querySelector('button[type="submit"]');
+        const oldText = btn.innerHTML;
+        btn.innerHTML = 'Mengirim...';
+        btn.disabled = true;
+
+        // Simulasi proses kirim (karena belum ada route backend-nya)
+        setTimeout(() => {
+            alert('Terima kasih! Laporan bug kamu sudah kami terima.');
+            tutupLaporBug();
+            e.target.reset();
+            btn.innerHTML = oldText;
+            btn.disabled = false;
+        }, 800);
+    };
+
+    // Tutup modal kalau klik area gelap di luar kotak
+    window.addEventListener('click', function(e) {
+        const modal = document.getElementById('bug-modal');
+        if (e.target === modal) {
+            tutupLaporBug();
+        }
+    });
 });

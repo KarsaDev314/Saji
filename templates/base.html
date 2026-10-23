@@ -1,9 +1,13 @@
+{% import '_icons.html' as icons %}
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Saji - Panduan Memasak{% endblock %}</title>
+    
+    <!-- Favicon Base64 -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZDM1NDAwIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMyAxMWgxOHY2YTIgMiAwIDAgMS0yIDJINWEyIDIgMCAwIDEtMi0ydi02eiIvPjxwYXRoIGQ9Ik04IDdjMC0xLjUgMS0yIDEtMyIvPjxwYXRoIGQ9Ik0xMiA3YzAtMS41IDEtMiAxLTMiLz48cGF0aCBkPSJNMTYgN2MwLTEuNSAxLTIgMS0zIi8+PC9zdmc+">
     
     <script>
         if (localStorage.getItem('saji_theme') === 'dark') {
@@ -24,12 +28,7 @@
         <div class="navbar-inner">
             <!-- LOGO -->
             <a href="{{ url_for('index') }}" class="brand">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);">
-                    <path d="M3 11h18v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6z"></path>
-                    <path d="M8 7c0-1.5 1-2 1-3"></path>
-                    <path d="M12 7c0-1.5 1-2 1-3"></path>
-                    <path d="M16 7c0-1.5 1-2 1-3"></path>
-                </svg>
+                {{ icons.brand_logo() }}
                 Saji
             </a>
             
@@ -37,36 +36,34 @@
                 {% if current_user.is_authenticated %}
                     <!-- Cari Teman -->
                     <a href="{{ url_for('daftar_pengguna') }}" class="nav-link-icon">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="9" cy="7" r="4"></circle>
-                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                        </svg>
+                        {{ icons.user_plus() }}
                         Cari Teman
                     </a>
                     
                     <!-- Notifikasi -->
                     <a href="{{ url_for('notifikasi') }}" class="nav-icon" title="Notifikasi">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                        </svg>
+                        {{ icons.bell() }}
                         {% if unread_notif > 0 %}
                         <span class="badge-notif">{{ unread_notif }}</span>
                         {% endif %}
                     </a>
 
-                    <!-- Username -->
-                    <a href="{{ url_for('profil', username=current_user.username) }}">@{{ current_user.username }}</a>
+                    <!-- Username & Avatar -->
+                    <a href="{{ url_for('profil', username=current_user.username) }}" class="nav-link-icon" style="gap: 8px;">
+                        {% if current_user.profile_pic and current_user.profile_pic != 'default_avatar.png' %}
+                            <img src="{{ url_for('static', filename='uploads/profiles/' + current_user.profile_pic) }}" alt="Avatar" class="nav-avatar">
+                        {% else %}
+                            <div class="nav-avatar" style="background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold;">
+                                {{ current_user.username[0]|upper }}
+                            </div>
+                        {% endif %}
+                        <span>@{{ current_user.username }}</span>
+                    </a>
                     
                     <!-- Settings Dropdown -->
                     <div class="settings-dropdown">
                         <button class="btn-settings" id="settings-btn" onclick="toggleSettingsMenu(event)" title="Pengaturan">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="12" cy="12" r="3"></circle>
-                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                            </svg>
+                            {{ icons.gear() }}
                         </button>
                         
                         <div class="settings-menu" id="settings-menu">
@@ -91,7 +88,7 @@
                             </a>
                             
                             <!-- Lapor Bug -->
-                            <a href="#" class="settings-item" onclick="alert('Fitur Feedback segera hadir!')">
+                            <a href="#" class="settings-item" onclick="bukaLaporBug(event)">
                                 <span style="display: flex; align-items: center; gap: 8px;">
                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="6" width="8" height="14" rx="4"></rect><path d="M19 7l-3 2"></path><path d="M5 7l3 2"></path><path d="M19 19l-3-2"></path><path d="M5 19l3-2"></path><path d="M20 13h-4"></path><path d="M4 13h4"></path><path d="M10 4L8 2"></path><path d="M14 4l2-2"></path></svg>
                                     Lapor Bug
@@ -135,5 +132,25 @@
     </div>
 
     {% block scripts %}{% endblock %}
+
+    <!-- MODAL LAPOR BUG -->
+    <div id="bug-modal" class="modal-overlay" style="z-index: 10000;">
+        <div class="modal-box" style="text-align: left; max-width: 450px;">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3 style="margin: 0;">Lapor Bug</h3>
+                <button type="button" onclick="tutupLaporBug()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+            </div>
+            <form id="bug-form" onsubmit="kirimLaporBug(event)">
+                <div class="form-group">
+                    <label>Ceritakan masalahnya</label>
+                    <textarea name="pesan_bug" rows="4" placeholder="Contoh: Tombol follow gak jalan pas di-klik..." required style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color); color: var(--text-main);"></textarea>
+                </div>
+                <div class="modal-aksi" style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 12px;">
+                    <button type="button" class="btn-outline" onclick="tutupLaporBug()">Batal</button>
+                    <button type="submit" class="btn-primary">Kirim Laporan</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </body>
 </html>

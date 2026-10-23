@@ -385,8 +385,16 @@ body, p, li, input, textarea, select, button { font-size: 1rem; line-height: 1.6
    10. SETTINGS DROPDOWN & DARK MODE
    ========================================================= */
 .settings-dropdown { position: relative; display: inline-block; }
-.btn-settings { background: transparent; border: none; cursor: pointer; padding: 8px; display: flex; align-items: center; color: var(--text-main); }
-.btn-settings:hover { transform: rotate(45deg); }
+.btn-settings { 
+    background: transparent; border: none; cursor: pointer; padding: 8px; 
+    display: flex; align-items: center; color: var(--text-main); 
+    transition: all 0.3s ease; border-radius: 50%; 
+}
+.btn-settings:hover, .btn-settings.active { 
+    color: var(--primary); 
+    background: rgba(211, 84, 0, 0.1); 
+    transform: rotate(90deg); 
+}
 .settings-menu {
     display: none; position: absolute; top: 100%; right: 0; margin-top: 10px;
     background: var(--card-bg); border: 1px solid var(--border-color);
@@ -563,4 +571,11 @@ body, p, li, input, textarea, select, button { font-size: 1rem; line-height: 1.6
 .card-body:hover .meta,
 .card-body:hover .author {
     text-decoration: none !important;
+}/* Avatar di Navbar */
+.nav-avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid var(--border-color);
 }

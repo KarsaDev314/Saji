@@ -8,7 +8,7 @@ from services import notification_service
 from services.user_service import find_by_id
 from routes import register_all
 
-def create_app():
+def create_app(test_config=None):
     app = Flask(__name__)
     app.config["SECRET_KEY"] = config.SECRET_KEY
     app.config["SESSION_COOKIE_HTTPONLY"] = True
@@ -18,6 +18,11 @@ def create_app():
     basedir = os.path.abspath(os.path.dirname(__file__))
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "saji.db")
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    
+    # Tambahan buat testing
+    if test_config:
+        app.config.update(test_config)
+        
     db.init_app(app)
 
     csrf.init_app(app)
