@@ -1574,4 +1574,135 @@ button:active, .btn-primary:active, .btn-outline:active {
 [data-theme="dark"] .star-rating label:hover,
 [data-theme="dark"] .star-rating label:hover ~ label {
     color: var(--warning) !important; /* Warna kuning buat bintang nyala */
+}/* ===== FIX AVATAR FOTO PROFIL ===== */
+.avatar-large, .avatar-placeholder {
+    overflow: hidden;
+    position: relative;
+}
+
+.avatar-large img, .avatar-placeholder img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Biar foto gak penyok */
+    border-radius: 50%;
+}/* ===== KUNCI LAYOUT PROFIL ===== */
+.profile-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+}
+
+/* Biar avatar muter cantik kalau ada fotonya */
+.avatar-large {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 16px;
+    overflow: hidden;
+}
+
+.avatar-large img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}/* ===== CUSTOM FILE UPLOAD ===== */
+.custom-file-upload {
+    border: 2px dashed var(--border-color);
+    border-radius: 12px;
+    padding: 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #fafbfc;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.custom-file-upload:hover {
+    border-color: var(--primary);
+    background: #fff5eb;
+}
+
+.upload-icon { font-size: 2rem; margin-bottom: 10px; }
+.upload-text { font-weight: 600; color: var(--text-main); margin-bottom: 4px; }
+.upload-subtext { font-size: 0.85rem; color: var(--text-muted); }
+
+/* Modal Crop Box */
+.crop-modal-box {
+    max-width: 500px;
+    padding: 0;
+    overflow: hidden;
+}
+
+.crop-modal-box .modal-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.crop-modal-box .modal-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.crop-container {
+    width: 100%;
+    height: 400px;
+    background: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#image-to-crop {
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+}
+
+.crop-modal-box .modal-aksi {
+    padding: 0 20px 20px 20px;
+    justify-content: flex-end;
+}/* ===== CROPPER UI (YOUTUBE STYLE) ===== */
+.crop-modal-box {
+    max-width: 450px;
+    padding: 0;
+    overflow: hidden;
+    border-radius: 16px;
+}
+
+.crop-container {
+    width: 100%;
+    height: 350px;
+    background: #1a1a1a; /* Warna gelap khas YouTube */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#image-to-crop {
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+}
+
+/* Bikin Mask-nya Bulat */
+.cropper-view-box,
+.cropper-face {
+    border-radius: 50%;
+}
+
+/* Efek bayangan gelap di luar lingkaran */
+.cropper-view-box {
+    outline: 2px solid rgba(255, 255, 255, 0.8);
+    outline-color: rgba(255, 255, 255, 0.8);
 }

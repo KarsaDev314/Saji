@@ -40,3 +40,9 @@ MIN_USERNAME = 3
 MIN_PASSWORD = 6
 MAX_BIO = 300
 MAX_KOMENTAR = 500
+
+import os
+
+UPLOAD_FOLDER = os.path.join("static", "uploads", "profiles")
+ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
+MAX_CONTENT_LENGTH = 2 * 1024 * 1024  # Maksimal 2MB (Anti-DoS)

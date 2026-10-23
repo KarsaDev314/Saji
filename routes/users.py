@@ -9,6 +9,11 @@ import validators
 from models import to_public_dict
 from permissions import current_id
 
+import os
+from werkzeug.utils import secure_filename
+from flask import current_app
+import uuid
+import config
 
 def register(app):
     @app.route("/profil/<username>")
@@ -71,10 +76,12 @@ def register(app):
         # Fallback redirect
         flash(pesan, kategori)
         return redirect(request.referrer or url_for("index"))
-
     @app.route("/pengaturan", methods=["GET", "POST"])
     @login_required
     def pengaturan():
+        # Tarik data terbaru dari database buat nampilin foto lama
+        user_data = user_service.find_record_by_id(int(current_user.id))
+
         if request.method == "POST":
             username = request.form.get("username", "").strip()
             bio = request.form.get("bio", "").strip()
@@ -87,13 +94,28 @@ def register(app):
             if not error:
                 error = validators.validate_bio(bio)
             if error:
-                return render_template("pengaturan.html", error=error), 400
+                # Kirim user_data lagi biar form gak error
+                return render_template("pengaturan.html", error=error, user_data=user_data), 400
 
-            user_service.update_profile(int(current_user.id), username, bio)
+            # --- LOGIKA UPLOAD FOTO PROFIL ---
+            file = request.files.get("profile_pic")
+            filename = None
+            if file and file.filename != '':
+                ext = file.filename.rsplit('.', 1)[1].lower() if '.' in file.filename else ''
+                if ext not in config.ALLOWED_EXTENSIONS:
+                    return render_template("pengaturan.html", error="Format gambar harus JPG, PNG, atau GIF.", user_data=user_data), 400
+                
+                filename = f"user_{current_user.id}_{uuid.uuid4().hex[:6]}.{ext}"
+                filepath = os.path.join(current_app.root_path, config.UPLOAD_FOLDER, filename)
+                os.makedirs(os.path.dirname(filepath), exist_ok=True)
+                file.save(filepath)
+
+            user_service.update_profile(int(current_user.id), username, bio, filename)
             flash("Profil berhasil diperbarui.", config.FLASH_SUKSES)
             return redirect(url_for("profil", username=username))
 
-        return render_template("pengaturan.html")
+        # Pas pertama buka halaman (GET), kirim user_data
+        return render_template("pengaturan.html", user_data=user_data)
 
     @app.route("/pengguna")
     @login_required

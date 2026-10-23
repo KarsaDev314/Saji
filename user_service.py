@@ -68,15 +68,16 @@ def authenticate(username, password):
                 record.get("bio", ""), record.get("join_date", ""))
 
 
-def update_profile(user_id, username, bio):
+def update_profile(user_id, username, bio, filename=None):
     users = storage.load_users()
     for u in users:
         if u["id"] == int(user_id):
             u["username"] = username
             u["bio"] = bio
+            if filename:
+                u["profile_pic"] = filename
             break
     storage.save_users(users)
-
 
 def follow_stats(users, user_id):
     """Return (follower_count, following_count, following_users, followers_list)."""

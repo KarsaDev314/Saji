@@ -1,6 +1,13 @@
 <div class="comment-item" id="k-{{ k.id }}">
     <div class="comment-header">
-        <a href="{{ url_for('profil', username=k.username) }}" class="comment-user">@{{ k.username }}</a>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            {% if k.user_pic and k.user_pic != 'default_avatar.png' %}
+                <img src="{{ url_for('static', filename='uploads/profiles/' + k.user_pic) }}" alt="Avatar" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover;">
+            {% else %}
+                <div style="width: 24px; height: 24px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: bold;">{{ k.username[0]|upper }}</div>
+            {% endif %}
+            <a href="{{ url_for('profil', username=k.username) }}" class="comment-user">@{{ k.username }}</a>
+        </div>
         <span class="comment-time">{{ k.waktu }}</span>
     </div>
     

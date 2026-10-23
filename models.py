@@ -12,10 +12,10 @@ class User(UserMixin):
 
 
 def to_public_dict(record):
-    """Konversi record user (dict JSON) ke bentuk yang aman ditampilkan."""
     return {
         "id": record["id"],
         "username": record["username"],
         "bio": record.get("bio", ""),
         "join_date": record.get("join_date", ""),
+        "profile_pic": record.get("profile_pic", "default_avatar.png") # <--- HARUS ADA
     }

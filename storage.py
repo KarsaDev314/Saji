@@ -15,12 +15,14 @@ def load_users():
     for u in users:
         following = [f.following_id for f in Follow.query.filter_by(follower_id=u.id).all()]
         favorit_ids = [f.recipe_id for f in Favorite.query.filter_by(user_id=u.id).all()]
+        
         result.append({
             "id": u.id,
             "username": u.username,
             "password_hash": u.password_hash,
             "bio": u.bio or "",
             "join_date": u.join_date or "",
+            "profile_pic": u.profile_pic or "default_avatar.png", # <--- HARUS ADA
             "following": following,
             "favorit_ids": favorit_ids
         })
@@ -29,7 +31,7 @@ def load_users():
 def save_users(users_data):
     user_ids = [u["id"] for u in users_data]
     
-    # Hapus user yang tidak ada di list
+    # Hapus user yang gak ada di list
     User.query.filter(~User.id.in_(user_ids)).delete(synchronize_session=False)
     
     for u_data in users_data:
@@ -37,10 +39,12 @@ def save_users(users_data):
         if not user:
             user = User(id=u_data["id"])
             db.session.add(user)
+            
         user.username = u_data["username"]
         user.password_hash = u_data["password_hash"]
         user.bio = u_data.get("bio", "")
         user.join_date = u_data.get("join_date", "")
+        user.profile_pic = u_data.get("profile_pic", "default_avatar.png") # <--- INI WAJIB ADA
         
         # Sync Follows
         db.session.query(Follow).filter_by(follower_id=user.id).delete()
@@ -61,7 +65,6 @@ def load_recipes():
     result = []
     for r in recipes:
         likes = [l.user_id for l in RecipeLike.query.filter_by(recipe_id=r.id).all()]
-        
         comments_db = Comment.query.filter_by(recipe_id=r.id).all()
         comments_tree = _build_comment_tree(comments_db)
         

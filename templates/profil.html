@@ -7,12 +7,22 @@
 
     <!-- Header Profil -->
     <div class="profile-header-card">
+        
+        <!-- Kiri: Info & Avatar -->
         <div class="profile-info">
+            <div class="avatar-large">
+                {% if user_pub.profile_pic and user_pub.profile_pic != 'default_avatar.png' %}
+                    <img src="{{ url_for('static', filename='uploads/profiles/' + user_pub.profile_pic) }}" alt="Avatar">
+                {% else %}
+                    {{ user_pub.username[0]|upper }}
+                {% endif %}
+            </div>
             <h1>@{{ user_pub.username }}</h1>
             <p class="profile-bio">{{ user_pub.bio or 'Belum ada bio.' }}</p>
             <p class="meta">Bergabung sejak {{ user_pub.join_date }}</p>
         </div>
         
+        <!-- Kanan: Tombol Aksi -->
         <div class="profile-actions">
             {% if current_user.is_authenticated and user_id != user_idku %}
                 <form method="POST" action="{{ url_for('toggle_follow', target_id=user_id) }}">
@@ -27,7 +37,7 @@
         </div>
     </div>
 
-    <!-- Statistik (Sekarang pakai tombol buat buka Modal) -->
+    <!-- Statistik -->
     <div class="profile-stats">
         <a href="#resep-user" class="stat-item">
             <strong>{{ total_resep }}</strong>
@@ -117,7 +127,6 @@
         document.getElementById('modal-follow').style.display = 'none';
     }
 
-    // Tutup modal kalau klik di luar kotak
     window.onclick = function(event) {
         const modal = document.getElementById('modal-follow');
         if (event.target == modal) {

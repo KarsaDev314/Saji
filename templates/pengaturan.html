@@ -3,6 +3,8 @@
 {% block title %}Pengaturan - Saji{% endblock %}
 
 {% block content %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+    
     <a href="{{ url_for('profil', username=current_user.username) }}" class="btn-back">← Kembali ke Profil</a>
 
     <div class="form-header">
@@ -11,12 +13,34 @@
     </div>
 
     <div class="form-container">
-        <form method="POST" class="form-card">
+        <form method="POST" class="form-card" enctype="multipart/form-data" id="settings-form">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             
             {% if error %}
             <div class="alert-danger">{{ error }}</div>
             {% endif %}
+
+                <div class="form-group">
+                <label>Foto Profil (Maks 2MB)</label>
+                <div style="display: flex; align-items: center; gap: 20px;">
+                    
+                        <!-- Preview Avatar (Pinter) -->
+                    <div class="avatar-large" id="avatar-preview-container" style="margin: 0; width: 80px; height: 80px; font-size: 2rem;">
+                        {% if user_data.profile_pic and user_data.profile_pic != 'default_avatar.png' %}
+                            <img id="avatar-preview-img" src="{{ url_for('static', filename='uploads/profiles/' + user_data.profile_pic) }}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                        {% else %}
+                            <span id="avatar-preview-text">{{ user_data.username[0]|upper }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Tombol Custom -->
+                    <div class="custom-file-upload" onclick="document.getElementById('profile_pic').click()" style="padding: 15px 25px; border-radius: 8px; border: 2px dashed var(--border-color); cursor: pointer;">
+                        <input type="file" id="profile_pic" name="profile_pic" accept="image/*" style="display: none;" onchange="handleFileSelect(event)">
+                        <div class="upload-text" style="margin: 0; font-size: 0.95rem;">📷 Pilih Foto Baru</div>
+                    </div>
+                </div>
+                <span class="text-muted" style="margin-top: 8px;">Format: JPG, PNG. Maks 2MB.</span>
+            </div>
 
             <div class="form-group">
                 <label>Username</label>
@@ -31,8 +55,105 @@
             </div>
 
             <div class="form-actions">
-                <button type="submit" class="btn-primary btn-lg">💾 Simpan Perubahan</button>
+                <button type="submit" class="btn-primary btn-lg" id="btn-submit">💾 Simpan Perubahan</button>
             </div>
         </form>
     </div>
+
+    <!-- MODAL CROPPER -->
+    <div id="crop-modal" class="modal-overlay">
+        <div class="modal-box crop-modal-box">
+            <div class="modal-header" style="padding: 16px 24px; border-bottom: 1px solid var(--border-color);">
+                <h3 style="margin: 0;">Sesuaikan Foto</h3>
+            </div>
+            <div class="crop-container">
+                <img id="image-to-crop" src="" alt="Crop Image">
+            </div>
+            <div class="modal-aksi" style="padding: 20px 24px; justify-content: flex-end; border-top: 1px solid var(--border-color);">
+                <button type="button" class="btn-outline" onclick="cancelCrop()">Batal</button>
+                <button type="button" class="btn-primary" onclick="applyCrop()" id="btn-crop-apply">Selesai</button>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+    <script>
+        let cropper = null;
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (!file.type.startsWith('image/')) {
+                alert('Harap pilih file gambar.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = document.getElementById('image-to-crop');
+                img.src = e.target.result;
+                
+                document.getElementById('crop-modal').style.display = 'flex';
+
+                if (cropper) cropper.destroy();
+                cropper = new Cropper(img, {
+                    aspectRatio: 1, // Paksa jadi kotak/bulat
+                    viewMode: 1,
+                    dragMode: 'move',
+                    autoCropArea: 1,
+                    restore: false,
+                    guides: false,
+                    center: false,
+                    highlight: false,
+                    cropBoxMovable: false,
+                    cropBoxResizable: false,
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function cancelCrop() {
+            document.getElementById('crop-modal').style.display = 'none';
+            document.getElementById('profile_pic').value = ''; 
+        }
+
+                function applyCrop() {
+            if (!cropper) return;
+            const btnApply = document.getElementById('btn-crop-apply');
+            btnApply.innerHTML = 'Memproses...';
+
+            cropper.getCroppedCanvas({
+                width: 400, 
+                height: 400,
+            }).toBlob((blob) => {
+                const file = new File([blob], "profile_pic.jpg", { type: "image/jpeg" });
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                document.getElementById('profile_pic').files = dataTransfer.files;
+                
+                // --- UPDATE PREVIEW AVATAR SECARA PINTAR ---
+                const container = document.getElementById('avatar-preview-container');
+                
+                // Hapus isi lama (teks inisial atau img lama)
+                container.innerHTML = ''; 
+                
+                // Bikin elemen img baru buat preview
+                const newImg = document.createElement('img');
+                newImg.src = URL.createObjectURL(blob);
+                newImg.style.width = '100%';
+                newImg.style.height = '100%';
+                newImg.style.objectFit = 'cover';
+                newImg.style.borderRadius = '50%';
+                
+                // Masukin ke dalam container
+                container.appendChild(newImg);
+
+                document.getElementById('crop-modal').style.display = 'none';
+                btnApply.innerHTML = 'Selesai';
+            }, 'image/jpeg');
+        }
+    </script>
 {% endblock %}

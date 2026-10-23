@@ -11,15 +11,9 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String(255), nullable=False)
     bio = db.Column(db.String(300), default="")
     join_date = db.Column(db.String(20), default="")
+    profile_pic = db.Column(db.String(200), default="default_avatar.png", nullable=False) # <--- HARUS DI SINI
 
-    def to_public_dict(self):
-        return {
-            "id": self.id,
-            "username": self.username,
-            "bio": self.bio or "",
-            "join_date": self.join_date or "",
-        }
-
+# ... (class Follow, Recipe, dll) ...
 
 class Follow(db.Model):
     """Tabel relasi follow: siapa follow siapa."""
