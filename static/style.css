@@ -614,4 +614,28 @@ a:hover { text-decoration: underline; }
     .auth-wrapper { min-height: calc(100vh - 60px); }
     .auth-right { padding: 20px; }
     .auth-box { padding: 30px 20px; box-shadow: none; border: none; background: transparent; }
+}/* ===== FIX KLIK SELURUH KARTU RESEP ===== */
+.recipe-card {
+    position: relative; /* Wajib buat nampung overlay */
+}
+
+.card-body {
+    position: static; /* Biar overlay-nya ngikutin si .recipe-card */
+}
+
+/* Trik: Bikin tag <a> menyebar ke seluruh kotak */
+.card-body::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1; /* Taruh di atas */
+}
+
+/* Naikin z-index tombol bintang biar gak ketutup overlay <a> */
+.card-action {
+    position: relative;
+    z-index: 2;
 }

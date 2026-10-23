@@ -37,7 +37,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await fetchPost(form.action, new FormData(form));
                 if (data.status === 'ok') {
                     btn.classList.toggle('aktif', data.is_favorit);
-                    btn.innerHTML = data.is_favorit ? '⭐ Favorit' : '☆ Favorit';
+                    
+                    // BENERIN DI SINI: Cek apakah tombolnya ikon (beranda) atau teks (detail)
+                    if (btn.classList.contains('btn-icon')) {
+                        btn.innerHTML = data.is_favorit ? '★' : '☆';
+                    } else {
+                        btn.innerHTML = data.is_favorit ? '⭐ Favorit' : '☆ Favorit';
+                    }
                 }
             } catch (err) { console.error("Gagal Favorit:", err); }
         });
