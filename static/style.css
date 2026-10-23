@@ -1135,4 +1135,95 @@ html { scroll-behavior: smooth; }
     background: #fff5eb;
     color: var(--primary);
     font-weight: 600;
+}/* ===== CUSTOM TOGGLE SWITCH (HANYA FAVORIT) ===== */
+/* Sembunyiin checkbox asli */
+.toggle-label input[type="checkbox"] {
+    display: none;
+}
+
+.toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+}
+
+/* Bikin bentuk sakelar */
+.toggle-switch {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    background-color: #cbd5e0; /* Warna abu-abu saat mati */
+    border-radius: 24px;
+    transition: background-color 0.3s;
+    display: inline-block;
+}
+
+/* Bikin bulatan (knob) */
+.toggle-switch::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 0.3s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Efek saat dicentang (nyala) */
+.toggle-label input[type="checkbox"]:checked + .toggle-switch {
+    background-color: var(--primary); /* Warna orange Saji */
+}
+
+/* Geser bulatan ke kanan saat dicentang */
+.toggle-label input[type="checkbox"]:checked + .toggle-switch::after {
+    transform: translateX(20px);
+}
+
+.toggle-text {
+    font-weight: 500;
+    color: var(--text-main);
+    user-select: none;
+}/* ===== FLOATING ACTION BUTTON (FAB) ===== */
+.fab-button {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background-color: var(--success); /* Warna hijau biar beda dari orange brand */
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    font-weight: 300;
+    line-height: 1;
+    text-decoration: none;
+    box-shadow: 0 4px 15px rgba(56, 161, 105, 0.4); /* Shadow hijau */
+    z-index: 1000;
+    transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+}
+
+.fab-button:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 8px 25px rgba(56, 161, 105, 0.6);
+    background-color: #2f855a; /* Hijau lebih gelap */
+    color: white;
+    text-decoration: none;
+}
+
+/* Sedikit penyesuaian di HP biar gak ketutup jempol */
+@media (max-width: 768px) {
+    .fab-button {
+        bottom: 20px;
+        right: 20px;
+        width: 56px;
+        height: 56px;
+        font-size: 2.2rem;
+    }
 }
