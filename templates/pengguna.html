@@ -3,31 +3,36 @@
 {% block title %}Cari Teman - Saji{% endblock %}
 
 {% block content %}
-    <div class="page-header" style="text-align: left; margin-bottom: 24px;">
+    <header class="page-header" style="text-align: left; margin-bottom: 32px;">
         <h1>Cari Teman</h1>
         <p>Temukan pengguna lain dan ikuti mereka untuk melihat resep di Feed-mu.</p>
-    </div>
+    </header>
 
     <div class="user-grid">
         {% for u in daftar_user %}
         <div class="user-card">
-            
-            <!-- BUNGKUS AREA ATAS PAKAI LINK <a> -->
-            <a href="{{ url_for('profil', username=u.username) }}" class="user-card-header">
-                                <div class="avatar-large">
+            <!-- BAGIAN ATAS: Avatar & Teks -->
+            <a href="{{ url_for('profil', username=u.username) }}" class="user-card-link">
+                <div class="avatar-large">
                     {% if u.profile_pic and u.profile_pic != 'default_avatar.png' %}
                         <img src="{{ url_for('static', filename='uploads/profiles/' + u.profile_pic) }}" alt="Avatar">
                     {% else %}
                         {{ u.username[0]|upper }}
                     {% endif %}
                 </div>
+                <!-- TEKS INI YANG TADI HILANG -->
+                <h3>@{{ u.username }}</h3>
+                <p class="user-bio">{{ u.bio or 'Belum ada bio.' }}</p>
+                <p class="user-stats"><strong>{{ u.follower_count }}</strong> Follower</p>
+            </a>
             
+            <!-- BAGIAN BAWAH: Tombol Follow -->
             <div class="user-card-action">
-                <form method="POST" action="{{ url_for('toggle_follow', target_id=u.id) }}" class="form-follow">
+                <form method="POST" action="{{ url_for('toggle_follow', target_id=u.id) }}">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <button type="submit" class="btn-primary w-full {% if u.sudah_follow %}btn-outline{% endif %}">
-                        {% if u.sudah_follow %}Mengikuti{% else %}Ikuti{% endif %}
-                    </button>
+    {% if u.sudah_follow %}Mengikuti{% else %}Ikuti{% endif %}
+</button>
                 </form>
             </div>
         </div>

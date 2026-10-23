@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await fetchPost(form.action, new FormData(form));
                 if (data.status === 'ok') {
                     btn.classList.toggle('aktif', data.is_follow);
-                    btn.innerHTML = data.is_follow ? 'Berhenti Mengikuti' : 'Ikuti';
+                     btn.innerHTML = data.is_follow ? 'Mengikuti' : 'Ikuti';
                     if (followerCountSpan) followerCountSpan.textContent = data.follower_count;
                 }
             } catch (err) { console.error("Gagal Follow:", err); }
