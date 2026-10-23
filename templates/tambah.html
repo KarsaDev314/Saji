@@ -1,61 +1,57 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ "Edit" if mode == "edit" else "Tambah" }} Resep - Panduan Memasak</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <a href="{{ url_for('index') }}" class="kembali">← Kembali ke daftar</a>
+{% extends 'base.html' %}
 
-    <h1>{{ "✏️ Edit Resep" if mode == "edit" else "➕ Tambah Resep" }}</h1>
+{% block title %}{% if mode == 'edit' %}Edit Resep{% else %}Tambah Resep{% endif %} - Saji{% endblock %}
 
-    {% if error %}
-    <p class="error">⚠️ {{ error }}</p>
-    {% endif %}
+{% block content %}
+    <a href="javascript:history.back()" class="btn-back">← Kembali</a>
 
-    {% set is_edit = (mode == "edit") %}
+    <div class="form-header">
+        <h1>{% if mode == 'edit' %}Edit Resep{% else %}Resep Baru{% endif %}</h1>
+        <p>Bagikan resep rahasia atau masakan andalanmu.</p>
+    </div>
 
-    <form method="POST" action="{{ url_for('edit', resep_id=resep.id) if is_edit else url_for('tambah') }}" class="form-tambah">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="form-container">
+        <form method="POST" class="form-card">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            
+            {% if error %}
+            <div class="alert-danger">{{ error }}</div>
+            {% endif %}
 
-        <label>
-            Nama Resep
-            <input type="text" name="nama" required value="{{ resep.nama if is_edit else '' }}" placeholder="misal: Soto Ayam">
-        </label>
+            <div class="form-row">
+                <div class="form-group flex-2">
+                    <label>Nama Resep</label>
+                    <input type="text" name="nama" value="{{ resep.nama if resep else '' }}" placeholder="Misal: Nasi Goreng Spesial" required maxlength="100">
+                </div>
+                <div class="form-group flex-1">
+                    <label>Kategori</label>
+                    <select name="kategori">
+                        {% for k in kategori_list %}
+                        <option value="{{ k }}" {% if resep and resep.kategori == k %}selected{% endif %}>{{ k }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group flex-1">
+                    <label>Waktu Masak</label>
+                    <input type="text" name="waktu" value="{{ resep.waktu if resep else '' }}" placeholder="Misal: 30 menit" maxlength="50">
+                </div>
+            </div>
 
-        <label>
-            Kategori
-            <select name="kategori">
-                {% for k in kategori_list %}
-                <option value="{{ k }}" {% if is_edit and resep.kategori == k %}selected{% endif %}>
-                    {{ k }}
-                </option>
-                {% endfor %}
-            </select>
-        </label>
+            <div class="form-group">
+                <label>Bahan-bahan <span class="text-muted">(Satu bahan per baris)</span></label>
+                <textarea name="bahan" rows="5" placeholder="2 butir telur&#10;1 batang daun bawang&#10;Garam secukupnya" required>{% if resep %}{{ resep.bahan|join('\n') }}{% endif %}</textarea>
+            </div>
 
-        <label>
-            Waktu Memasak
-            <input type="text" name="waktu" value="{{ resep.waktu if is_edit else '' }}" placeholder="misal: 30 menit">
-        </label>
+            <div class="form-group">
+                <label>Langkah Memasak <span class="text-muted">(Satu langkah per baris)</span></label>
+                <textarea name="langkah" rows="6" placeholder="Panaskan minyak...&#10;Tumis bawang...&#10;Masukkan telur..." required>{% if resep %}{{ resep.langkah|join('\n') }}{% endif %}</textarea>
+            </div>
 
-        <label>
-            Bahan-bahan (satu per baris)
-            <textarea name="bahan" rows="5" placeholder="2 butir telur&#10;3 sdm kecap manis">{{ resep.bahan|join('\n') if is_edit else '' }}</textarea>
-        </label>
-
-        <label>
-            Langkah Memasak (satu per baris)
-            <textarea name="langkah" rows="6" placeholder="Panaskan minyak.&#10;Tumis bawang hingga harum.">{{ resep.langkah|join('\n') if is_edit else '' }}</textarea>
-        </label>
-
-        <div class="aksi">
-            <button type="submit">
-                {{ "💾 Simpan Perubahan" if is_edit else "💾 Simpan Resep" }}
-            </button>
-            <a href="{{ url_for('index') }}" class="batal">Batal</a>
-        </div>
-    </form>
-</body>
-</html>
+            <div class="form-actions">
+                <button type="submit" class="btn-primary btn-lg">
+                    {% if mode == 'edit' %}💾 Simpan Perubahan{% else %}🚀 Publikasikan Resep{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

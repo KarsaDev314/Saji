@@ -97,21 +97,23 @@
 
         <!-- KOMENTAR (Di Bawah) -->
         <div class="card full-width-comment" id="komentar">
-            <h2>💬 Komentar ({{ resep.get('comments', [])|length }})</h2>
-            {% if current_user.is_authenticated %}
-            <form method="POST" action="{{ url_for('tambah_komentar', resep_id=resep.id) }}" class="form-stack ajax-comment-form">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <textarea name="teks" rows="2" placeholder="Tulis komentar..." maxlength="500" required class="input-textarea"></textarea>
-                <button type="submit" class="btn-primary">Kirim</button>
-            </form>
-            {% endif %}
-            <div class="comment-list">
-                {% for k in resep.get('comments', [])|reverse %}
-                    {% include '_komentar_item.html' %}
-                {% endfor %}
-            </div>
-        </div>
+    <h2>💬 Komentar ({{ resep.get('comments', [])|length }})</h2>
+    
+    {% if current_user.is_authenticated %}
+    <form method="POST" action="{{ url_for('tambah_komentar', resep_id=resep.id) }}" class="form-stack ajax-comment-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <textarea name="teks" rows="2" placeholder="Tulis komentar..." maxlength="500" required class="input-textarea"></textarea>
+        <!-- Kasih align-self: flex-start biar tombol gak melebar -->
+        <button type="submit" class="btn-primary" style="align-self: flex-start;">Kirim</button>
+    </form>
+    {% endif %}
+
+    <div class="comment-list">
+        {% for k in resep.get('comments', [])|reverse %}
+            {% include '_komentar_item.html' %}
+        {% endfor %}
     </div>
+</div>
 
     <!-- Modal Hapus -->
     <div id="modal-hapus" class="modal-overlay">

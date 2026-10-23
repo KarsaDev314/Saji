@@ -3,8 +3,22 @@
         <a href="{{ url_for('profil', username=k.username) }}" class="comment-user">@{{ k.username }}</a>
         <span class="comment-time">{{ k.waktu }}</span>
     </div>
-    <p class="comment-text">{{ k.teks }}</p>
     
+    <!-- LOGIKA EDIT: Kalau URL punya ?edit=id, tampilkan form -->
+    {% if request.args.get('edit') == k.id %}
+        <form method="POST" action="{{ url_for('edit_komentar', resep_id=resep.id, komentar_id=k.id) }}" class="form-edit-komentar">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="text" name="teks" value="{{ k.teks }}" class="input-edit-teks" required>
+            <div class="edit-actions">
+                <button type="submit" class="btn-primary btn-sm">Simpan</button>
+                <a href="{{ url_for('detail', resep_id=resep.id) }}#k-{{ k.id }}" class="btn-text">Batal</a>
+            </div>
+        </form>
+    {% else %}
+        <p class="comment-text">{{ k.teks }}</p>
+    {% endif %}
+
+    <!-- AKSI: Balas, Edit, Hapus -->
     <div class="comment-actions">
         {% if current_user.is_authenticated %}
             <button type="button" class="btn-text" onclick="toggleReply('{{ k.id }}')">↩ Balas</button>
@@ -18,15 +32,17 @@
         {% endif %}
     </div>
 
+    <!-- FORM BALASAN (Tersembunyi, muncul pas klik Balas) -->
     <div id="reply-form-{{ k.id }}" class="reply-form" style="display: none;">
         <form method="POST" action="{{ url_for('tambah_komentar', resep_id=resep.id) }}" class="form-stack ajax-comment-form">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="parent_id" value="{{ k.id }}">
             <textarea name="teks" rows="2" placeholder="Balas @{{ k.username }}..." required class="input-textarea"></textarea>
-            <button type="submit" class="btn-primary">Kirim</button>
+            <button type="submit" class="btn-primary btn-sm" style="align-self: flex-start;">Kirim</button>
         </form>
     </div>
 
+    <!-- DAFTAR BALASAN (Recursive) -->
     {% if k.replies %}
     <div class="comment-replies">
         {% for rep in k.replies %}

@@ -241,4 +241,247 @@ a:hover { text-decoration: underline; }
 .bintang-kartu, .bintang-isi {
     color: var(--warning);
     letter-spacing: 2px;
+}/* ===== HALAMAN FORM TAMBAH/EDIT RESEP ===== */
+.form-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+.form-header h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--text-main);
+    letter-spacing: -1px;
+    margin-bottom: 8px;
+}
+.form-header p {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+}
+
+.form-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.form-card {
+    background: var(--card-bg);
+    padding: 40px;
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.form-row {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+.flex-2 { flex: 2; min-width: 250px; }
+.flex-1 { flex: 1; min-width: 150px; }
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: var(--text-main);
+    font-size: 0.95rem;
+}
+
+.form-group .text-muted {
+    font-weight: 400;
+    font-size: 0.85rem;
+}
+
+.form-group input[type="text"],
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 1rem;
+    color: var(--text-main);
+    background: #fafafa;
+    transition: all 0.2s;
+}
+
+.form-group input[type="text"]:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: white;
+    box-shadow: 0 0 0 4px rgba(211, 84, 0, 0.1);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 120px;
+    line-height: 1.6;
+}
+
+.form-actions {
+    margin-top: 16px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-lg {
+    padding: 14px 32px;
+    font-size: 1.05rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(211, 84, 0, 0.2);
+}
+
+.alert-danger {
+    background: #fff5f5;
+    color: #c53030;
+    padding: 16px;
+    border-radius: 8px;
+    border-left: 4px solid #e53e3e;
+    font-weight: 500;
+}/* ===== FIX KOLOM KOMENTAR ===== */
+.comment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 24px;
+}
+
+.comment-item {
+    background: #fafbfc;
+    padding: 16px 20px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.comment-user {
+    font-weight: 700;
+    color: var(--primary);
+    text-decoration: none;
+    font-size: 0.95rem;
+}
+
+.comment-time {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.comment-text {
+    font-size: 0.95rem;
+    color: var(--text-main);
+    margin-bottom: 12px;
+    line-height: 1.6;
+}
+
+.comment-actions {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.btn-text {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.2s;
+    text-decoration: none;
+}
+
+.btn-text:hover { color: var(--primary); text-decoration: none; }
+.btn-text.text-danger:hover { color: var(--danger); }
+.btn-text form { margin: 0; display: inline; }
+
+/* Balasan (Reply) */
+.comment-replies {
+    margin-top: 16px;
+    padding-left: 20px;
+    border-left: 2px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.reply-form {
+    margin-top: 12px;
+    display: none;
+}
+
+/* Benerin Tombol Kirim Komentar biar gak Full Width */
+.ajax-comment-form .btn-primary,
+.reply-form .btn-primary {
+    width: auto !important; /* Paksa jadi selebar teksnya aja */
+    align-self: flex-end;   /* Dorong ke kanan */
+    padding: 10px 24px;
+    font-size: 0.95rem;
+    border-radius: 8px;
+}
+
+.reply-form .form-stack {
+    gap: 8px;
+}/* ===== FIX KOMENTAR (TOMBOL & EDIT) ===== */
+.comment-actions {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 10;
+}
+
+.form-edit-komentar {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.input-edit-teks {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.95rem;
+}
+
+.edit-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.btn-sm {
+    padding: 8px 16px !important;
+    font-size: 0.85rem !important;
+    border-radius: 6px !important;
+}
+
+/* Pastiin tombol Kirim & Simpan di komentar gak melar */
+.ajax-comment-form .btn-primary,
+.reply-form .btn-primary,
+.form-edit-komentar .btn-primary {
+    width: auto !important;
 }
