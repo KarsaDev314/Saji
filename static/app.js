@@ -246,4 +246,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 historyBox.style.display = 'none';
             }
         });
-    }
+    }        // Tambahan: Biar bisa diakses pakai keyboard (Enter / Spasi)
+        dropdownMenu.querySelectorAll('li').forEach((item, index) => {
+            item.setAttribute('tabindex', '0'); // Biar bisa di-focus
+            
+            item.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    item.click(); // Panggil fungsi klik
+                }
+            });
+        });

@@ -1317,10 +1317,32 @@ body, p, li, input, textarea, select, button {
 }
 
 /* 2. Aksesibilitas: Focus State buat user yang pakai keyboard (Tab) */
+*/* ===== FINAL FOCUS STATE (ACCESSIBILITY) ===== */
+
+/* 1. Fokus buat elemen biasa (tombol, link, input) */
 *:focus-visible {
-    outline: 3px solid var(--primary) !important;
-    outline-offset: 2px !important;
+    outline: none !important; /* Hapus outline bawaan */
+    box-shadow: 0 0 0 3px #ffffff, 0 0 0 6px var(--primary) !important; /* Trik double ring biar gak kepotong */
+    border-radius: 6px;
+    z-index: 999 !important; /* Biar selalu di atas */
+}
+
+/* 2. Fokus buat Custom Star Rating (Bintang) */
+/* Karena input radio-nya display: none, kita targetin labelnya pas input-nya fokus */
+.star-rating input:focus-visible + label {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
     border-radius: 4px;
+}
+
+/* 3. Fokus buat Custom Toggle Switch (Hanya Favorit) */
+.toggle-label input:focus-visible + .toggle-switch {
+    box-shadow: 0 0 0 3px #ffffff, 0 0 0 6px var(--primary) !important;
+}
+
+/* 4. Fokus buat Custom Dropdown Menu (biar bisa di-Tab) */
+.dropdown-btn:focus-visible {
+    box-shadow: 0 0 0 3px #ffffff, 0 0 0 6px var(--primary) !important;
 }
 
 /* 3. Benerin text-muted biar kontrasnya cukup (Accessibility) */
