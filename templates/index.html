@@ -18,17 +18,37 @@
     </div>
     {% endif %}
 
-    <form method="GET" action="/" class="filter-bar">
+        <form method="GET" action="/" class="filter-bar" id="search-form">
         <input type="hidden" name="mode" value="{{ mode }}">
         
         <div class="filter-inputs">
-            <input type="text" name="q" placeholder="Cari resep atau bahan..." value="{{ kata_kunci }}" class="input-search">
-            <select name="kategori" class="input-select">
-                <option value="">Semua Kategori</option>
-                {% for k in kategori_list %}
-                <option value="{{ k }}" {% if kategori_aktif == k %}selected{% endif %}>{{ k }}</option>
-                {% endfor %}
-            </select>
+            <div class="search-wrapper">
+                <input type="text" name="q" id="search-input" placeholder="Cari resep atau bahan..." value="{{ kata_kunci }}" class="input-search" autocomplete="off">
+                <!-- Kotak History Search -->
+                <div id="search-history" class="search-history-box" style="display: none;">
+                    <div class="history-header">
+                        <span>Pencarian Terakhir</span>
+                        <button type="button" id="clear-history">Hapus</button>
+                    </div>
+                    <ul id="history-list"></ul>
+                </div>
+            </div>
+
+            <!-- Custom Dropdown Kategori -->
+            <div class="custom-dropdown" id="category-dropdown">
+                <input type="hidden" name="kategori" id="category-value" value="{{ kategori_aktif }}">
+                <button type="button" class="dropdown-btn" id="category-btn">
+                    <span id="category-label">{% if kategori_aktif %}{{ kategori_aktif }}{% else %}Semua Kategori{% endif %}</span>
+                    <span class="arrow">▼</span>
+                </button>
+                <ul class="dropdown-menu" id="category-menu">
+                    <li data-value="">Semua Kategori</li>
+                    {% for k in kategori_list %}
+                    <li data-value="{{ k }}" {% if kategori_aktif == k %}class="active"{% endif %}>{{ k }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
             <button type="submit" class="btn-primary">🔍 Cari</button>
         </div>
         

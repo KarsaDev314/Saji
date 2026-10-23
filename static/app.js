@@ -143,4 +143,107 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
-});
+});    // 6. CUSTOM DROPDOWN KATEGORI
+    const dropdown = document.getElementById('category-dropdown');
+    const dropdownBtn = document.getElementById('category-btn');
+    const dropdownMenu = document.getElementById('category-menu');
+    const categoryValue = document.getElementById('category-value');
+    const categoryLabel = document.getElementById('category-label');
+
+    if (dropdownBtn) {
+        // Toggle buka/tutup
+        dropdownBtn.addEventListener('click', () => {
+            dropdown.classList.toggle('open');
+            document.getElementById('search-history').style.display = 'none'; // Tutup history kalau dropdown buka
+        });
+
+        // Pilih item
+        dropdownMenu.querySelectorAll('li').forEach(item => {
+            item.addEventListener('click', () => {
+                const val = item.getAttribute('data-value');
+                const text = item.innerText;
+                
+                categoryValue.value = val;
+                categoryLabel.innerText = text;
+                
+                // Update class active
+                dropdownMenu.querySelectorAll('li').forEach(li => li.classList.remove('active'));
+                item.classList.add('active');
+                
+                dropdown.classList.remove('open');
+            });
+        });
+
+        // Tutup kalau klik di luar
+        document.addEventListener('click', (e) => {
+            if (!dropdown.contains(e.target)) {
+                dropdown.classList.remove('open');
+            }
+        });
+    }
+
+    // 7. FITUR HISTORY SEARCH (LOCALSTORAGE)
+    const searchInput = document.getElementById('search-input');
+    const historyBox = document.getElementById('search-history');
+    const historyList = document.getElementById('history-list');
+    const clearHistoryBtn = document.getElementById('clear-history');
+
+    if (searchInput) {
+        // Ambil history dari localStorage
+        let searchHistory = JSON.parse(localStorage.getItem('saji_search_history')) || [];
+
+        // Tampilkan history
+        const renderHistory = () => {
+            if (searchHistory.length === 0) {
+                historyBox.style.display = 'none';
+                return;
+            }
+            historyList.innerHTML = '';
+            searchHistory.forEach(term => {
+                const li = document.createElement('li');
+                li.innerText = term;
+                li.addEventListener('click', () => {
+                    searchInput.value = term;
+                    document.getElementById('search-form').submit();
+                });
+                historyList.appendChild(li);
+            });
+            historyBox.style.display = 'block';
+        };
+
+        // Event saat input di-fokus
+        searchInput.addEventListener('focus', () => {
+            renderHistory();
+            if (dropdown) dropdown.classList.remove('open'); // Tutup dropdown kalau input fokus
+        });
+
+        // Event saat ngetik (tutup history biar gak nutupin)
+        searchInput.addEventListener('input', () => {
+            historyBox.style.display = 'none';
+        });
+
+        // Simpan history saat form disubmit
+        document.getElementById('search-form').addEventListener('submit', () => {
+            const val = searchInput.value.trim();
+            if (val && !searchHistory.includes(val)) {
+                searchHistory.unshift(val); // Taruh paling atas
+                searchHistory = searchHistory.slice(0, 5); // Maksimal 5
+                localStorage.setItem('saji_search_history', JSON.stringify(searchHistory));
+            }
+        });
+
+        // Hapus history
+        clearHistoryBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            searchHistory = [];
+            localStorage.removeItem('saji_search_history');
+            renderHistory();
+        });
+
+        // Tutup history kalau klik di luar
+        document.addEventListener('click', (e) => {
+            if (!searchInput.contains(e.target) && !historyBox.contains(e.target)) {
+                historyBox.style.display = 'none';
+            }
+        });
+    }
