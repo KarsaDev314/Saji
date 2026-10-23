@@ -72,8 +72,6 @@ def load_recipes():
             "waktu": r.waktu or "-",
             "bahan": r.bahan or [],
             "langkah": r.langkah or [],
-            "rating": r.rating or 0,
-            "catatan": r.catatan or "",
             "user_id": r.user_id,
             "likes": likes,
             "comments": comments_tree
@@ -114,8 +112,6 @@ def save_recipes(recipes_data):
         recipe.waktu = r_data.get("waktu", "-")
         recipe.bahan = r_data.get("bahan", [])
         recipe.langkah = r_data.get("langkah", [])
-        recipe.rating = r_data.get("rating", 0)
-        recipe.catatan = r_data.get("catatan", "")
         recipe.user_id = r_data.get("user_id", 0)
         
         # 1. Sync Likes Resep

@@ -6,17 +6,35 @@ import notification_service
 import storage
 import user_service
 from models import to_public_dict
+from db import db
+from db_models import RecipeRating, RecipeLike, Favorite, Comment, CommentReaction
 
 
 def all():
-    return storage.load_recipes()
+    recipes = storage.load_recipes()
+    if current_user.is_authenticated:
+        user_ratings = {rr.recipe_id: rr for rr in RecipeRating.query.filter_by(user_id=int(current_user.id)).all()}
+        for r in recipes:
+            rr = user_ratings.get(r["id"])
+            r["rating"] = rr.rating if rr else 0
+            r["catatan"] = rr.catatan if rr else ""
+    return recipes
 
 
 def find(recipe_id):
-    for r in storage.load_recipes():
-        if r["id"] == recipe_id:
-            return r
-    return None
+    recipes = storage.load_recipes()
+    recipe = next((r for r in recipes if r["id"] == recipe_id), None)
+    if recipe is None: 
+        return None
+    
+    if current_user.is_authenticated:
+        rr = RecipeRating.query.filter_by(user_id=int(current_user.id), recipe_id=recipe_id).first()
+        recipe["rating"] = rr.rating if rr else 0
+        recipe["catatan"] = rr.catatan if rr else ""
+    else:
+        recipe["rating"] = 0
+        recipe["catatan"] = ""
+    return recipe
 
 
 def create(data):
@@ -24,7 +42,7 @@ def create(data):
     new_id = max((r["id"] for r in recipes), default=0) + 1
     record = {
         "id": new_id,
-        "favorit": False, "rating": 0, "catatan": "",
+        "favorit": False,
         "likes": [], "comments": [],
         "user_id": int(current_user.id),
         **data,
@@ -44,6 +62,9 @@ def update(recipe_id, data):
 
 
 def delete(recipe_id):
+    # Hapus rating-nya dulu biar gak error Foreign Key
+    db.session.query(RecipeRating).filter_by(recipe_id=recipe_id).delete()
+    
     recipes = [r for r in storage.load_recipes() if r["id"] != recipe_id]
     storage.save_recipes(recipes)
 
@@ -70,13 +91,17 @@ def toggle_like(recipe_id):
 
 
 def set_rating(recipe_id, rating, catatan):
-    recipes = storage.load_recipes()
-    for r in recipes:
-        if r["id"] == recipe_id:
-            r["rating"] = rating
-            r["catatan"] = catatan
-            break
-    storage.save_recipes(recipes)
+    if not current_user.is_authenticated: 
+        return
+    uid = int(current_user.id)
+    
+    rr = db.session.get(RecipeRating, (uid, recipe_id))
+    if not rr:
+        rr = RecipeRating(user_id=uid, recipe_id=recipe_id)
+        db.session.add(rr)
+    rr.rating = rating
+    rr.catatan = catatan
+    db.session.commit()
 
 
 def toggle_favorite(recipe_id):

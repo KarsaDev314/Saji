@@ -36,10 +36,14 @@ class Recipe(db.Model):
     waktu = db.Column(db.String(50))
     bahan = db.Column(db.JSON, default=list)      # array of string
     langkah = db.Column(db.JSON, default=list)    # array of string
-    rating = db.Column(db.Integer, default=0)
-    catatan = db.Column(db.String(1000), default="")
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), default=0, nullable=False, index=True)
 
+class RecipeRating(db.Model):
+    __tablename__ = "recipe_ratings"
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), primary_key=True)
+    recipe_id = db.Column(db.Integer, db.ForeignKey("recipes.id"), primary_key=True)
+    rating = db.Column(db.Integer, default=0)
+    catatan = db.Column(db.String(1000), default="")
 
 class Favorite(db.Model):
     """User memfavoritkan resep tertentu."""
