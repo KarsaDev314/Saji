@@ -19,6 +19,11 @@ class Recipe(db.Model):
     waktu = db.Column(db.String(50), nullable=False)
     bahan = db.Column(db.Text, nullable=False)
     langkah = db.Column(db.Text, nullable=False)
+    
+    # TAMBAHKAN DUA BARIS INI
+    rating = db.Column(db.Integer, default=0)
+    catatan = db.Column(db.Text, default="")
+    
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
