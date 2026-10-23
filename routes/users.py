@@ -94,12 +94,12 @@ def register(app):
             if not error:
                 error = validators.validate_bio(bio)
             if error:
-                # Kirim user_data lagi biar form gak error
                 return render_template("pengaturan.html", error=error, user_data=user_data), 400
 
             # --- LOGIKA UPLOAD FOTO PROFIL ---
             file = request.files.get("profile_pic")
             filename = None
+            
             if file and file.filename != '':
                 ext = file.filename.rsplit('.', 1)[1].lower() if '.' in file.filename else ''
                 if ext not in config.ALLOWED_EXTENSIONS:
@@ -110,11 +110,17 @@ def register(app):
                 os.makedirs(os.path.dirname(filepath), exist_ok=True)
                 file.save(filepath)
 
+                # --- LOGIKA HAPUS FOTO LAMA ---
+                old_pic = user_data.get("profile_pic")
+                if old_pic and old_pic != "default_avatar.png":
+                    old_filepath = os.path.join(current_app.root_path, config.UPLOAD_FOLDER, old_pic)
+                    if os.path.exists(old_filepath):
+                        os.remove(old_filepath) # Hapus file lama dari folder
+
             user_service.update_profile(int(current_user.id), username, bio, filename)
             flash("Profil berhasil diperbarui.", config.FLASH_SUKSES)
             return redirect(url_for("profil", username=username))
 
-        # Pas pertama buka halaman (GET), kirim user_data
         return render_template("pengaturan.html", user_data=user_data)
 
     @app.route("/pengguna")
