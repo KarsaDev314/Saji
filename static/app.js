@@ -1,7 +1,4 @@
-// static/app.js
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("🔥 APP JS BERHASIL DIMUAT!");
-
     const fetchPost = async (url, formData) => {
         const response = await fetch(url, {
             method: 'POST',
@@ -11,44 +8,45 @@ document.addEventListener('DOMContentLoaded', () => {
         return response.json();
     };
 
-    // Kita pakai Event Delegation biar gak perlu nge-loop satu-satu
-    document.addEventListener('submit', async (e) => {
-        
-        // 1. Handle LIKE
-        if (e.target.matches('form[action*="/like"]')) {
+    // 1. LIKE
+    document.querySelectorAll('form[action*="/like"]').forEach(form => {
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const form = e.target;
             const btn = form.querySelector('button');
-            const countSpan = document.querySelector('.like-count');
+            
             try {
                 const data = await fetchPost(form.action, new FormData(form));
                 if (data.status === 'ok') {
-                    countSpan.textContent = `❤️ ${data.likes_count} Suka`;
                     btn.classList.toggle('aktif', data.is_liked);
-                    btn.innerHTML = data.is_liked ? '❤️ Batal Suka' : '🤍 Suka';
+                    if (data.is_liked) {
+                        btn.innerHTML = `❤️ ${data.likes_count} Suka`;
+                    } else {
+                        btn.innerHTML = `🤍 ${data.likes_count} Suka`;
+                    }
                 }
             } catch (err) { console.error("Gagal Like:", err); }
-        }
+        });
+    });
 
-        // 2. Handle FAVORIT
-        else if (e.target.matches('form[action*="/favorit"]')) {
+    // 2. FAVORIT
+    document.querySelectorAll('form[action*="/favorit"]').forEach(form => {
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const form = e.target;
             const btn = form.querySelector('button');
             try {
                 const data = await fetchPost(form.action, new FormData(form));
                 if (data.status === 'ok') {
                     btn.classList.toggle('aktif', data.is_favorit);
-                    if (btn.classList.contains('btn-icon')) btn.innerHTML = data.is_favorit ? '★' : '☆';
-                    else btn.innerHTML = data.is_favorit ? '⭐ Favorit' : '☆ Favorit';
+                    btn.innerHTML = data.is_favorit ? '⭐ Favorit' : '☆ Favorit';
                 }
             } catch (err) { console.error("Gagal Favorit:", err); }
-        }
+        });
+    });
 
-        // 3. Handle FOLLOW
-        else if (e.target.matches('form[action^="/follow/"]')) {
+    // 3. FOLLOW
+    document.querySelectorAll('form[action^="/follow/"]').forEach(form => {
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const form = e.target;
             const btn = form.querySelector('button');
             const followerCountSpan = document.getElementById('follower-count');
             try {
@@ -59,10 +57,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (followerCountSpan) followerCountSpan.textContent = data.follower_count;
                 }
             } catch (err) { console.error("Gagal Follow:", err); }
-        }
+        });
+    });
 
-        // 4. Handle KOMENTAR (Kirim & Balas)
-        else if (e.target.matches('.ajax-comment-form')) {
+    // 4. KOMENTAR (Kirim & Balas)
+    document.addEventListener('submit', async (e) => {
+        if (e.target.matches('.ajax-comment-form')) {
             e.preventDefault();
             const form = e.target;
             const btn = form.querySelector('button[type="submit"]');
@@ -99,5 +99,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.disabled = false;
             }
         }
+    });
+
+    // 5. RATING (Auto-save saat bintang diklik)
+    document.querySelectorAll('.ajax-rating-form input[type="radio"]').forEach(radio => {
+        radio.addEventListener('change', async (e) => {
+            const form = e.target.closest('form');
+            form.style.opacity = '0.5'; 
+
+            try {
+                const data = await fetchPost(form.action, new FormData(form));
+                if (data.status === 'ok') {
+                    form.style.opacity = '1';
+                }
+            } catch (err) {
+                console.error("Gagal simpan rating:", err);
+                form.style.opacity = '1'; 
+            }
+        });
     });
 });

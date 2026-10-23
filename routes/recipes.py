@@ -64,6 +64,7 @@ def register(app):
             abort(404)
         recipe_service.toggle_favorite(resep_id)
         
+        # Handle AJAX
         if request.headers.get("X-Requested-With") == "XMLHttpRequest":
             record = user_service.current_record()
             is_fav = resep_id in record.get("favorit_ids", [])
@@ -76,14 +77,21 @@ def register(app):
     def simpan_rating(resep_id):
         if recipe_service.find(resep_id) is None:
             abort(404)
+            
         try:
             rating = int(request.form.get("rating", "0"))
         except (TypeError, ValueError):
             rating = 0
         if rating not in config.RATING_VALID:
             rating = 0
+            
         catatan = request.form.get("catatan", "").strip()[:config.MAX_CATATAN]
         recipe_service.set_rating(resep_id, rating, catatan)
+        
+        # Handle AJAX
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return jsonify({"status": "ok", "rating": rating})
+            
         return redirect(url_for("detail", resep_id=resep_id))
 
     @app.route("/resep/<int:resep_id>/like", methods=["POST"])
@@ -93,6 +101,7 @@ def register(app):
             abort(404)
         recipe_service.toggle_like(resep_id)
         
+        # Handle AJAX
         if request.headers.get("X-Requested-With") == "XMLHttpRequest":
             resep_baru = recipe_service.find(resep_id)
             likes = resep_baru.get("likes", [])

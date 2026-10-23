@@ -3,45 +3,58 @@
 {% block title %}Beranda - Saji{% endblock %}
 
 {% block content %}
+    <!-- HEADER: Pakai Size besar (H1) dan Spacing lega -->
     <header class="page-header">
         <h1>Jelajahi Resep</h1>
         <p>Temukan inspirasi masakan hari ini.</p>
     </header>
 
+    <!-- MODE SWITCHER: Dibuat lebih kecil, jangan sampai nabrak fokus utama -->
     {% if current_user.is_authenticated %}
-    <div class="mode-switcher">
-        <a href="{{ url_for('index', mode='saya') }}" class="{% if mode == 'saya' %}aktif{% endif %}">👤 Resep Saya</a>
-        <a href="{{ url_for('index', mode='feed') }}" class="{% if mode == 'feed' %}aktif{% endif %}">📰 Feed</a>
-        <a href="{{ url_for('index', mode='explore') }}" class="{% if mode == 'explore' %}aktif{% endif %}">🌏 Explore</a>
+    <div class="mode-switcher-wrapper">
+        <div class="mode-switcher">
+            <a href="{{ url_for('index', mode='saya') }}" class="{% if mode == 'saya' %}aktif{% endif %}">👤 Resep Saya</a>
+            <a href="{{ url_for('index', mode='feed') }}" class="{% if mode == 'feed' %}aktif{% endif %}">📰 Feed</a>
+            <a href="{{ url_for('index', mode='explore') }}" class="{% if mode == 'explore' %}aktif{% endif %}">🌏 Explore</a>
+        </div>
     </div>
     {% endif %}
 
-    <!-- Filter Bar -->
+    <!-- FILTER BAR: Pakai Style shadow & Spacing biar beda dari card -->
     <form method="GET" action="/" class="filter-bar">
         <input type="hidden" name="mode" value="{{ mode }}">
-        <input type="text" name="q" placeholder="Cari resep atau bahan..." value="{{ kata_kunci }}" class="input-search">
-        <select name="kategori" class="input-select">
-            <option value="">Semua Kategori</option>
-            {% for k in kategori_list %}
-            <option value="{{ k }}" {% if kategori_aktif == k %}selected{% endif %}>{{ k }}</option>
-            {% endfor %}
-        </select>
-        <button type="submit" class="btn-primary">Cari</button>
         
-        <label class="checkbox-label">
-            <input type="checkbox" name="favorit" value="1" {% if hanya_favorit %}checked{% endif %}>
-            ⭐ Hanya Favorit
-        </label>
+        <div class="filter-inputs">
+            <input type="text" name="q" placeholder="Cari resep atau bahan..." value="{{ kata_kunci }}" class="input-search">
+            <select name="kategori" class="input-select">
+                <option value="">Semua Kategori</option>
+                {% for k in kategori_list %}
+                <option value="{{ k }}" {% if kategori_aktif == k %}selected{% endif %}>{{ k }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn-primary">🔍 Cari</button>
+        </div>
+        
+        <div class="filter-checkbox">
+            <label>
+                <input type="checkbox" name="favorit" value="1" {% if hanya_favorit %}checked{% endif %}>
+                ⭐ Hanya Favorit
+            </label>
+            {% if hanya_favorit %}
+            <a href="{{ url_for('index', mode=mode) }}" class="reset-link">✕ Reset</a>
+            {% endif %}
+        </div>
     </form>
 
+    <!-- TOOLBAR: Posisi antara filter dan grid -->
     <div class="toolbar">
-        <span>Menampilkan <strong>{{ resep_list|length }}</strong> resep</span>
+        <span class="meta">Menampilkan <strong>{{ resep_list|length }}</strong> resep</span>
         {% if current_user.is_authenticated %}
         <a href="{{ url_for('tambah') }}" class="btn-success">+ Tambah Resep</a>
         {% endif %}
     </div>
 
-    <!-- Grid Layout untuk Resep -->
+    <!-- GRID RESEP: Pakai Spacing (gap) yang lega -->
     {% if resep_list %}
         <div class="recipe-grid">
             {% for resep in resep_list %}
