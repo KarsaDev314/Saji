@@ -320,7 +320,27 @@ body, p, li, input, textarea, select, button { font-size: 1rem; line-height: 1.6
 .user-card-action form { margin: 0; }
 .user-card-action .btn-primary, .user-card-action .btn-outline { width: 100%; padding: 10px; font-size: 0.95rem; }
 
-.custom-file-upload { border: 2px dashed var(--border-color); border-radius: 12px; padding: 30px; text-align: center; cursor: pointer; background: #fafbfc; transition: 0.2s; }
+.custom-file-upload {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px; /* Ukuran lebih proporsional */
+    border: 2px dashed var(--border-color);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-main);
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-left: 20px; /* Jarak dari avatar */
+}
+
+.custom-file-upload:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: rgba(211, 84, 0, 0.05);
+}
 .custom-file-upload:hover { border-color: var(--primary); background: #fff5eb; }
 
 /* =========================================================

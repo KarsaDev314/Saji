@@ -2,9 +2,9 @@
 from flask import abort, render_template, request
 
 import config
-import recipe_service
-import user_service
-from permissions import can_edit_recipe, can_moderate_comment, current_id
+from services import recipe_service
+from services import user_service
+from utils.permissions import can_edit_recipe, can_moderate_comment, current_id
 
 
 def register(app):

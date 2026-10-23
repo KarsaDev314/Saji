@@ -1,11 +1,10 @@
 """Route komentar: tambah, edit, hapus, like, dislike."""
 from flask import abort, flash, redirect, request, url_for, jsonify, render_template
 from flask_login import login_required
-
-import comment_service
+from services import comment_service
 import config
-import recipe_service
-from permissions import can_moderate_comment
+from services import recipe_service
+from utils.permissions import can_moderate_comment
 
 
 def register(app):

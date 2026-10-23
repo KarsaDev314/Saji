@@ -3,10 +3,10 @@ from flask import abort, redirect, render_template, request, url_for, jsonify
 from flask_login import login_required, current_user
 
 import config
-import recipe_service
-import user_service
-import validators
-from permissions import can_edit_recipe
+from services import recipe_service
+from services import user_service
+from utils import validators
+from utils.permissions import can_edit_recipe
 
 
 def register(app):

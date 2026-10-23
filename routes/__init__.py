@@ -1,8 +1,5 @@
-"""Registrasi semua route ke app."""
-from routes import auth, comments, main, notifications, recipes, users
-
-
 def register_all(app):
+    from routes import auth, main, recipes, comments, users, notifications
     auth.register(app)
     main.register(app)
     recipes.register(app)

@@ -90,18 +90,34 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- FOLLOW ---
+        // --- FOLLOW ---
     document.querySelectorAll('form[action^="/follow/"]').forEach(form => {
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = form.querySelector('button');
-            const followerCountSpan = document.getElementById('follower-count');
+            // Cari elemen follower count di dalam card yang sama
+            const card = btn.closest('.user-card');
+            const followerCountSpan = card ? card.querySelector('.follower-count-text') : null;
+            
             try {
                 const data = await fetchPost(form.action, new FormData(form));
                 if (data.status === 'ok') {
-                    btn.classList.toggle('aktif', data.is_follow);
-                     btn.innerHTML = data.is_follow ? 'Mengikuti' : 'Ikuti';
-                    if (followerCountSpan) followerCountSpan.textContent = data.follower_count;
+                    // 1. Ubah Teks Tombol
+                    btn.innerHTML = data.is_follow ? 'Mengikuti' : 'Ikuti';
+                    
+                    // 2. Swap Class Warna Tombol (Ini yang tadi ilang!)
+                    if (data.is_follow) {
+                        btn.classList.remove('btn-primary');
+                        btn.classList.add('btn-outline');
+                    } else {
+                        btn.classList.remove('btn-outline');
+                        btn.classList.add('btn-primary');
+                    }
+                    
+                    // 3. Update Angka Follower secara Live
+                    if (followerCountSpan) {
+                        followerCountSpan.textContent = data.follower_count;
+                    }
                 }
             } catch (err) { console.error("Gagal Follow:", err); }
         });

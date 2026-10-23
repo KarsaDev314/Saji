@@ -5,8 +5,8 @@ import uuid
 from flask_login import current_user
 
 import config
-import notification_service
-import storage
+from services import notification_service
+from services import storage
 
 
 def find(comments, comment_id):
