@@ -1,50 +1,40 @@
 {% extends 'base.html' %}
 
-{% block title %}{% if kode == 500 %}Waduh, Error!{% else %}Halaman Hilang!{% endif %} - Saji{% endblock %}
+{% block title %}{{ kode or 404 }} - Saji{% endblock %}
 
 {% block content %}
     <div class="error-page-wrapper">
         <div class="error-card">
-            <!-- Ikon Lucu -->
-            <div class="error-icon">
-                {% if kode == 500 %}
-                🍳💥
+            
+            <div style="margin-bottom: 20px; display: flex; justify-content: center; color: var(--primary);">
+                {% if kode == 403 %}
+                    <!-- Icon Lock -->
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                {% elif kode == 500 %}
+                    <!-- Icon Warning -->
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                 {% else %}
-                🍽️💨
+                    <!-- Icon Search -->
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 {% endif %}
             </div>
-
-            <!-- Kode Error -->
-            <h1 class="error-code">
-                {% if kode %}{{ kode }}{% else %}404{% endif %}
-            </h1>
-
-            <!-- Pesan -->
-            <h2 class="error-title">
-                {% if kode == 500 %}
-                Dapur Kami Kebakaran!
-                {% elif kode == 403 %}
-                Area Terlarang!
-                {% else %}
-                Resepnya Kabur!
-                {% endif %}
-            </h2>
             
-            <p class="error-desc">
-                {% if pesan %}
-                    {{ pesan }}
-                {% elif kode == 500 %}
-                    Ada yang salah dengan resep di dapur kami. Koki (developer) sedang memperbaikinya.
-                {% elif kode == 403 %}
-                    Kamu tidak punya izin untuk masuk ke dapur ini. Kembalilah ke area aman.
-                {% else %}
-                    Sepertinya bahan yang kamu cari sudah dimakan kucing, atau halamannya pindah ke dapur lain.
-                {% endif %}
-            </p>
+            <h1 class="error-code">{{ kode or 404 }}</h1>
+            
+            {% if kode == 403 %}
+                <h2>Akses Ditolak</h2>
+                <p>{{ pesan or 'Kamu tidak punya izin mengakses halaman ini.' }}</p>
+            {% elif kode == 500 %}
+                <h2>Dapur Kebakaran!</h2>
+                <p>{{ pesan or 'Ada yang salah dengan resep di dapur kami. Koki (developer) sedang memperbaikinya.' }}</p>
+            {% else %}
+                <h2>Resepnya Kabur!</h2>
+                <p>{{ pesan or 'Sepertinya bahan yang kamu cari sudah dimakan kucing, atau halamannya pindah ke dapur lain.' }}</p>
+            {% endif %}
 
-            <!-- Tombol Kembali -->
-            <a href="{{ url_for('index') }}" class="btn-primary btn-lg" style="text-decoration: none; display: inline-block;">
-                🏠 Balik ke Beranda
+            <a href="{{ url_for('index') }}" class="btn-primary" style="margin-top: 24px; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                Balik ke Beranda
             </a>
         </div>
     </div>
