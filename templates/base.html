@@ -87,7 +87,17 @@
                                 </span>
                             </a>
                             
-                            <!-- Lapor Bug -->
+                            <!-- KHUSUS ADMIN: Laporan Bug -->
+                            {% if current_user.username|lower == 'admin' %}
+                            <a href="{{ url_for('admin_bugs') }}" class="settings-item">
+                                <span style="display: flex; align-items: center; gap: 8px;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="6" width="8" height="14" rx="4"></rect><path d="M19 7l-3 2"></path><path d="M5 7l3 2"></path><path d="M19 19l-3-2"></path><path d="M5 19l3-2"></path><path d="M20 13h-4"></path><path d="M4 13h4"></path><path d="M10 4L8 2"></path><path d="M14 4l2-2"></path></svg>
+                                    Laporan Bug
+                                </span>
+                            </a>
+                            {% endif %}
+
+                            <!-- Lapor Bug (Buat User Biasa) -->
                             <a href="#" class="settings-item" onclick="bukaLaporBug(event)">
                                 <span style="display: flex; align-items: center; gap: 8px;">
                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="6" width="8" height="14" rx="4"></rect><path d="M19 7l-3 2"></path><path d="M5 7l3 2"></path><path d="M19 19l-3-2"></path><path d="M5 19l3-2"></path><path d="M20 13h-4"></path><path d="M4 13h4"></path><path d="M10 4L8 2"></path><path d="M14 4l2-2"></path></svg>
@@ -108,7 +118,7 @@
                                 </button>
                             </form>
                         </div>
-                    </div>
+                    </div> <!-- INI DIA YANG TADI ILANG -->
 
                 {% else %}
                     <a href="{{ url_for('login') }}">Login</a>
@@ -141,6 +151,7 @@
                 <button type="button" onclick="tutupLaporBug()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted);">&times;</button>
             </div>
             <form id="bug-form" onsubmit="kirimLaporBug(event)">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div class="form-group">
                     <label>Ceritakan masalahnya</label>
                     <textarea name="pesan_bug" rows="4" placeholder="Contoh: Tombol follow gak jalan pas di-klik..." required style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color); color: var(--text-main);"></textarea>

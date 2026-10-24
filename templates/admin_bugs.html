@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin - Bug Reports{% endblock %}
+
+{% block content %}
+    <header class="page-header" style="text-align: left; margin-bottom: 32px;">
+        <h1>Pusat Laporan Bug</h1>
+        <p>Daftar semua masalah yang dilaporkan oleh pengguna Saji.</p>
+    </header>
+
+    <div class="card" style="padding: 0; overflow: hidden;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead style="background: var(--bg-color); border-bottom: 1px solid var(--border-color);">
+                <tr>
+                    <th style="padding: 16px;">Tanggal</th>
+                    <th style="padding: 16px;">User ID</th>
+                    <th style="padding: 16px;">Pesan</th>
+                    <th style="padding: 16px;">Status</th>
+                    <th style="padding: 16px; text-align: center;">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in reports %}
+                <tr style="border-bottom: 1px solid var(--border-color);">
+                    <td style="padding: 16px; font-size: 0.9rem; color: var(--text-muted);">{{ r.created_at.strftime('%Y-%m-%d %H:%M') if r.created_at else '-' }}</td>
+                    <td style="padding: 16px;">{{ r.user_id or 'Guest' }}</td>
+                    <td style="padding: 16px; font-weight: 500;">{{ r.message }}</td>
+                    <td style="padding: 16px;">
+                        {% if r.status == 'pending' %}
+                            <span style="background: rgba(214, 158, 46, 0.2); color: var(--warning); padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold;">PENDING</span>
+                        {% else %}
+                            <span style="background: rgba(56, 161, 105, 0.2); color: var(--success); padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold;">RESOLVED</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 16px; text-align: center;">
+                        {% if r.status == 'pending' %}
+                        <form method="POST" action="{{ url_for('resolve_bug', bug_id=r.id) }}" style="margin: 0;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn-success btn-sm" style="display: inline-flex; align-items: center; gap: 4px;">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                Selesai
+                            </button>
+                        </form>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" style="padding: 40px; text-align: center; color: var(--text-muted);">Belum ada laporan bug.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

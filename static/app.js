@@ -334,20 +334,37 @@ document.addEventListener('DOMContentLoaded', () => {
         if (modal) modal.style.display = 'none';
     };
 
-    window.kirimLaporBug = function(e) {
+    window.kirimLaporBug = async function(e) {
         e.preventDefault();
-        const btn = e.target.querySelector('button[type="submit"]');
+        const form = e.target;
+        const btn = form.querySelector('button[type="submit"]');
         const oldText = btn.innerHTML;
         btn.innerHTML = 'Mengirim...';
         btn.disabled = true;
 
-        setTimeout(() => {
-            alert('Terima kasih! Laporan bug kamu sudah kami terima.');
-            tutupLaporBug();
-            e.target.reset();
+        try {
+            // Kita tembak langsung ke endpoint API
+            const response = await fetch('/api/lapor-bug', {
+                method: 'POST',
+                body: new FormData(form),
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            const data = await response.json();
+            
+            if (data.status === 'ok') {
+                alert(data.message);
+                tutupLaporBug();
+                form.reset();
+            } else {
+                alert(data.message);
+            }
+        } catch (err) {
+            console.error("Gagal kirim bug:", err);
+            alert("Terjadi kesalahan sistem.");
+        } finally {
             btn.innerHTML = oldText;
             btn.disabled = false;
-        }, 800);
+        }
     };
 
     window.addEventListener('click', function(e) {
