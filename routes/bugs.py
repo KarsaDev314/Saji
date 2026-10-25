@@ -5,7 +5,8 @@ from flask_login import current_user, login_required
 import config
 
 def register(app):
-    @app.route("/api/lapor-bug", methods=["POST"])
+    # UBAH /api/lapor-bug JADI /api/bugs
+    @app.route("/api/bugs", methods=["POST"])
     def lapor_bug():
         pesan = request.form.get("pesan_bug", "").strip()
         if not pesan:

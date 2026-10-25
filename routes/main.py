@@ -2,9 +2,8 @@
 from flask import abort, render_template, request
 
 import config
-from services import recipe_service
-from services import user_service
-from utils.permissions import can_edit_recipe, can_moderate_comment, current_id
+from services import recipe_service, user_service # <-- Ada from services
+from utils.permissions import can_edit_recipe, can_moderate_comment, current_id # <-- Ada from utils
 
 
 def register(app):
@@ -58,7 +57,8 @@ def register(app):
             favorit_ids=favorite_ids,
         )
 
-    @app.route("/resep/<int:resep_id>")
+    # UBAH URL JADI PLURAL (RESOURCE-BASED)
+    @app.route("/recipes/<int:resep_id>")
     def detail(resep_id):
         resep = recipe_service.find(resep_id)
         if resep is None:

@@ -1,3 +1,4 @@
+"""Route komentar."""
 from flask import render_template, request, redirect, url_for, abort, jsonify
 from flask_login import login_required, current_user
 from services import comment_service, recipe_service
@@ -5,12 +6,13 @@ from utils.permissions import can_moderate_comment
 import config
 
 def register(app):
-    @app.route("/resep/<int:resep_id>/komentar", methods=["POST"])
+    # UBAH /resep/ JADI /recipes/ ... /comments
+    @app.route("/recipes/<int:resep_id>/comments", methods=["POST"])
     @login_required
     def tambah_komentar(resep_id):
         teks = request.form.get("teks", "").strip()
         if not teks:
-            return jsonify({"status": "error", "message": "Kosong"}), 400
+            return redirect(url_for("detail", resep_id=resep_id) + "#komentar")
         
         parent_id = request.form.get("parent_id")
         new_komentar = comment_service.add(resep_id, teks, parent_id)
@@ -21,7 +23,7 @@ def register(app):
             return jsonify({"status": "ok", "html": html})
         return redirect(url_for("detail", resep_id=resep_id) + "#komentar")
 
-    @app.route("/resep/<int:resep_id>/komentar/<int:komentar_id>/hapus", methods=["POST"])
+    @app.route("/recipes/<int:resep_id>/comments/<int:komentar_id>/delete", methods=["POST"])
     @login_required
     def hapus_komentar(resep_id, komentar_id):
         resep = recipe_service.find(resep_id)
@@ -34,7 +36,7 @@ def register(app):
             return jsonify({"status": "ok"})
         return redirect(url_for("detail", resep_id=resep_id) + "#komentar")
 
-    @app.route("/resep/<int:resep_id>/komentar/<int:komentar_id>/edit", methods=["POST"])
+    @app.route("/recipes/<int:resep_id>/comments/<int:komentar_id>/edit", methods=["POST"])
     @login_required
     def edit_komentar(resep_id, komentar_id):
         resep = recipe_service.find(resep_id)
@@ -48,7 +50,7 @@ def register(app):
             return jsonify({"status": "ok", "teks": teks_baru})
         return redirect(url_for("detail", resep_id=resep_id) + "#komentar")
 
-    @app.route("/resep/<int:resep_id>/komentar/<int:komentar_id>/like", methods=["POST"])
+    @app.route("/recipes/<int:resep_id>/comments/<int:komentar_id>/likes", methods=["POST"])
     @login_required
     def like_komentar(resep_id, komentar_id):
         comment_service.toggle_reaction(resep_id, komentar_id, "like")
@@ -56,7 +58,7 @@ def register(app):
             return jsonify({"status": "ok"})
         return redirect(url_for("detail", resep_id=resep_id) + "#komentar")
 
-    @app.route("/resep/<int:resep_id>/komentar/<int:komentar_id>/dislike", methods=["POST"])
+    @app.route("/recipes/<int:resep_id>/comments/<int:komentar_id>/dislikes", methods=["POST"])
     @login_required
     def dislike_komentar(resep_id, komentar_id):
         comment_service.toggle_reaction(resep_id, komentar_id, "dislike")

@@ -9,7 +9,8 @@ from utils import validators
 import config
 
 def register(app):
-    @app.route("/profil/<username>")
+    # UBAH /profil/ JADI /users/
+    @app.route("/users/<username>")
     def profil(username):
         target = user_service.find_by_username(username)
         if not target: abort(404)
@@ -29,30 +30,22 @@ def register(app):
             user_idku=int(current_user.id) if current_user.is_authenticated else None
         )
 
-    @app.route("/pengguna")
+    # UBAH /pengguna JADI /users
+    @app.route("/users")
     @login_required
     def daftar_pengguna():
         return render_template("pengguna.html", daftar_user=user_service.list_other_users(int(current_user.id)))
 
-    @app.route("/follow/<int:target_id>", methods=["POST"])
+    # UBAH /follow/ JADI /users/<id>/follow
+    @app.route("/users/<int:target_id>/follow", methods=["POST"])
     @login_required
     def toggle_follow(target_id):
         res = user_service.toggle_follow(target_id)
-        
-        # --- LOGIKA AJAX (Biar tombol gak reload) ---
-        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-            if res.get("status") == "error":
-                return jsonify(res), 400
-            return jsonify(res)
-            
-        # Fallback redirect biasa
-        if res.get("status") == "error":
-            flash(res["message"], "info")
-        else:
-            flash("Berhasil.", "sukses")
+        if res: flash(*res)
         return redirect(request.referrer or url_for("index"))
 
-    @app.route("/pengaturan", methods=["GET", "POST"])
+    # UBAH /pengaturan JADI /settings
+    @app.route("/settings", methods=["GET", "POST"])
     @login_required
     def pengaturan():
         user_data = user_service.find_record_by_id(current_user.id)

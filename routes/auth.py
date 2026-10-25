@@ -1,38 +1,52 @@
-from flask import render_template, request, redirect, url_for, flash
-from flask_login import login_user, logout_user
-from core.db import db
-from core.db_models import User
-from werkzeug.security import generate_password_hash, check_password_hash
-from utils import validators
+from flask import flash, redirect, render_template, request, url_for
+from flask_login import current_user, login_required, login_user, logout_user
 from extensions import limiter
+import config
+from services import user_service  # <-- Ada from services
+from utils import validators       # <-- Ada from utils
 
 def register(app):
+    @app.route("/register", methods=["GET", "POST"])
+    def register():
+        if current_user.is_authenticated:
+            return redirect(url_for("index"))
+        if request.method == "POST":
+            username = request.form.get("username", "").strip()
+            password = request.form.get("password", "")
+            password2 = request.form.get("password2", "")
+            error = validators.validate_registration(username, password, password2)
+            if not error and user_service.find_by_username(username):
+                error = "Username sudah dipakai. Coba yang lain."
+            if error:
+                return render_template("register.html", error=error), 400
+            user = user_service.register(username, password)
+            login_user(user)
+            flash(f"Selamat datang, {username}! Akun berhasil dibuat.", config.FLASH_SUKSES)
+            return redirect(url_for("index"))
+        return render_template("register.html")
+
     @app.route("/login", methods=["GET", "POST"])
     @limiter.limit("5 per minute")
     def login():
+        if current_user.is_authenticated:
+            return redirect(url_for("index"))
         if request.method == "POST":
-            user = User.query.filter_by(username=request.form.get("username")).first()
-            if user and check_password_hash(user.password_hash, request.form.get("password")):
-                login_user(user)
-                return redirect(url_for("index"))
-            flash("Login gagal", "info")
+            username = request.form.get("username", "").strip()
+            password = request.form.get("password", "")
+            user = user_service.authenticate(username, password)
+            if not user:
+                return render_template("login.html", error="Username atau password salah."), 400
+            login_user(user)
+            flash(f"Halo, {username}! Kamu berhasil login.", config.FLASH_SUKSES)
+            next_page = request.args.get("next")
+            if next_page and next_page.startswith("/"):
+                return redirect(next_page)
+            return redirect(url_for("index"))
         return render_template("login.html")
 
-    @app.route("/register", methods=["GET", "POST"])
-    def register():
-        if request.method == "POST":
-            u = request.form.get("username").strip()
-            p = request.form.get("password")
-            err = validators.validate_username_format(u)
-            if err: 
-                flash(err, "info")
-            else:
-                db.session.add(User(username=u, password_hash=generate_password_hash(p)))
-                db.session.commit()
-                return redirect(url_for("login"))
-        return render_template("register.html")
-
     @app.route("/logout", methods=["POST"])
+    @login_required
     def logout():
         logout_user()
+        flash("Kamu sudah logout.", config.FLASH_INFO)
         return redirect(url_for("index"))

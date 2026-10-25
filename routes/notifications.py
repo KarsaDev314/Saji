@@ -3,7 +3,8 @@ from flask_login import login_required, current_user
 from services import notification_service
 
 def register(app):
-    @app.route("/notifikasi")
+    # UBAH /notifikasi JADI /notifications
+    @app.route("/notifications")
     @login_required
     def notifikasi():
         notifs = notification_service.fetch_and_mark_read(int(current_user.id))

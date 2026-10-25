@@ -1,12 +1,15 @@
+"""Route mutasi resep."""
 from flask import abort, redirect, render_template, request, url_for, jsonify
 from flask_login import login_required
+
 import config
 from services import recipe_service
 from utils import validators
 from utils.permissions import can_edit_recipe
 
 def register(app):
-    @app.route("/tambah", methods=["GET", "POST"])
+    # UBAH /tambah JADI /recipes/new
+    @app.route("/recipes/new", methods=["GET", "POST"])
     @login_required
     def tambah():
         if request.method == "POST":
@@ -17,7 +20,8 @@ def register(app):
             return redirect(url_for("detail", resep_id=new_id))
         return render_template("tambah.html", mode="tambah", kategori_list=config.KATEGORI_VALID)
 
-    @app.route("/resep/<int:resep_id>/edit", methods=["GET", "POST"])
+    # UBAH URL EDIT
+    @app.route("/recipes/<int:resep_id>/edit", methods=["GET", "POST"])
     @login_required
     def edit(resep_id):
         resep = recipe_service.find(resep_id)
@@ -32,7 +36,8 @@ def register(app):
             return redirect(url_for("detail", resep_id=resep_id))
         return render_template("tambah.html", resep=resep, mode="edit", kategori_list=config.KATEGORI_VALID)
 
-    @app.route("/resep/<int:resep_id>/hapus", methods=["POST"])
+    # UBAH URL HAPUS (Gunakan /delete karena HTML form gak support method DELETE)
+    @app.route("/recipes/<int:resep_id>/delete", methods=["POST"])
     @login_required
     def hapus(resep_id):
         resep = recipe_service.find(resep_id)
@@ -41,7 +46,8 @@ def register(app):
         recipe_service.delete(resep_id)
         return redirect(url_for("index"))
 
-    @app.route("/resep/<int:resep_id>/favorit", methods=["POST"])
+    # UBAH URL FAVORIT (PLURAL)
+    @app.route("/recipes/<int:resep_id>/favorites", methods=["POST"])
     @login_required
     def toggle_favorit(resep_id):
         if recipe_service.find(resep_id) is None: abort(404)
@@ -51,7 +57,8 @@ def register(app):
             return jsonify({"status": "ok", "is_favorit": is_fav})
         return redirect(request.referrer or url_for("index"))
 
-    @app.route("/resep/<int:resep_id>/rating", methods=["POST"])
+    # UBAH URL RATING (PLURAL)
+    @app.route("/recipes/<int:resep_id>/ratings", methods=["POST"])
     @login_required
     def simpan_rating(resep_id):
         if recipe_service.find(resep_id) is None: abort(404)
@@ -67,7 +74,8 @@ def register(app):
             return jsonify({"status": "ok"})
         return redirect(url_for("detail", resep_id=resep_id))
 
-    @app.route("/resep/<int:resep_id>/like", methods=["POST"])
+    # UBAH URL LIKE (PLURAL)
+    @app.route("/recipes/<int:resep_id>/likes", methods=["POST"])
     @login_required
     def toggle_like(resep_id):
         if recipe_service.find(resep_id) is None: abort(404)
