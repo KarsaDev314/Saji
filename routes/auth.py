@@ -4,9 +4,11 @@ from core.db import db
 from core.db_models import User
 from werkzeug.security import generate_password_hash, check_password_hash
 from utils import validators
+from extensions import limiter
 
 def register(app):
     @app.route("/login", methods=["GET", "POST"])
+    @limiter.limit("5 per minute")
     def login():
         if request.method == "POST":
             user = User.query.filter_by(username=request.form.get("username")).first()

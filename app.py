@@ -2,7 +2,7 @@ import os
 from flask import Flask, render_template
 from flask_login import current_user
 import config
-from extensions import csrf, login_manager
+from extensions import csrf, login_manager, limiter
 from core.db import db
 from services import notification_service
 from services.user_service import find_by_id
@@ -27,6 +27,7 @@ def create_app(test_config=None):
 
     csrf.init_app(app)
     login_manager.init_app(app)
+    limiter.init_app(app)
     login_manager.login_view = "login"
     login_manager.login_message = "Silakan login dulu untuk mengakses halaman ini."
     login_manager.login_message_category = "info"
@@ -53,6 +54,10 @@ def _register_error_handlers(app):
     def server_error(e):
         db.session.rollback()
         return render_template("404.html", kode=500), 500
+    @app.errorhandler(429)
+    def ratelimit_handler(e):
+        return render_template("404.html", kode=429, 
+                               pesan="Kamu terlalu banyak mencoba. Istirahat dulu 1 menit ya!"), 429
 
 def _register_context_processors(app):
     @app.context_processor
