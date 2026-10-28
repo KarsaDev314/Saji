@@ -35,10 +35,10 @@
             <div class="nav-links">
                 {% if current_user.is_authenticated %}
                     <!-- Cari Teman -->
-                    <a href="{{ url_for('daftar_pengguna') }}" class="nav-link-icon">
-                        {{ icons.user_plus() }}
-                        Cari Teman
-                    </a>
+<a href="{{ url_for('daftar_pengguna') }}" class="nav-link-icon" title="Cari Teman">
+    {{ icons.user_plus() }}
+    <span class="nav-text">Cari Teman</span>
+</a>
                     
                     <!-- Notifikasi -->
                     <a href="{{ url_for('notifikasi') }}" class="nav-icon" title="Notifikasi">
@@ -57,7 +57,7 @@
                                 {{ current_user.username[0]|upper }}
                             </div>
                         {% endif %}
-                        <span>@{{ current_user.username }}</span>
+                        <span class="nav-text">@{{ current_user.username }}</span>
                     </a>
                     
                     <!-- Settings Dropdown -->

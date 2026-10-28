@@ -74,7 +74,7 @@ body, p, li, input, textarea, select, button { font-size: 1rem; line-height: 1.6
 .brand svg { transition: transform 0.2s; color: var(--primary); }
 .brand:hover svg { transform: rotate(-10deg) scale(1.1); }
 
-.nav-links { display: flex; align-items: center; gap: 20px; flex-wrap: nowrap; }
+.nav-links { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
 .nav-link-icon {
     display: inline-flex; align-items: center; gap: 6px;
     color: var(--text-main); text-decoration: none;
@@ -142,6 +142,9 @@ body, p, li, input, textarea, select, button { font-size: 1rem; line-height: 1.6
     box-shadow: 0 0 0 4px rgba(211, 84, 0, 0.1);
 }
 .form-group textarea { resize: vertical; min-height: 120px; }
+.form-row { display: flex; gap: 16px; flex-wrap: wrap; }
+.form-row .flex-1 { flex: 1; min-width: 180px; }
+.form-row .flex-2 { flex: 2; min-width: 240px; }
 
 /* =========================================================
    5. HALAMAN BERANDA (INDEX)
@@ -463,10 +466,12 @@ body, p, li, input, textarea, select, button { font-size: 1rem; line-height: 1.6
     box-shadow: 0 0 0 3px #ffffff, 0 0 0 6px var(--primary) !important;
     border-radius: 6px;
     z-index: 999 !important;
-}/* ===== FIX AUTH FULL SCREEN (INSTAGRAM STYLE) ===== */
+}
+
+/* ===== FIX AUTH FULL SCREEN (INSTAGRAM STYLE) ===== */
 .auth-wrapper {
     position: fixed !important;
-    top: 60px !important; /* Sesuaikan tinggi navbar */
+    top: 60px !important;
     left: 0 !important;
     width: 100vw !important;
     height: calc(100vh - 60px) !important;
@@ -671,4 +676,120 @@ body, p, li, input, textarea, select, button { font-size: 1rem; line-height: 1.6
     text-align: center;
     color: var(--text-muted);
     font-size: 0.95rem;
+}
+
+/* =========================================================
+   11. MOBILE RESPONSIVE (max-width: 768px)
+   ========================================================= */
+@media (max-width: 768px) {
+    /* --- Typography --- */
+    h1 { font-size: 1.75rem; }
+    h2 { font-size: 1.35rem; }
+    h3 { font-size: 1.05rem; }
+    .page-header h1 { font-size: 1.75rem; }
+    .header-info h1 { font-size: 1.75rem; }
+    .profile-info h1 { font-size: 1.75rem; }
+    .error-code { font-size: 4rem; }
+    .text-muted { font-size: 0.8rem; }
+
+    /* --- Container --- */
+    .container { padding: 0 16px; margin: 20px auto; }
+    .card { padding: 20px; }
+    .form-card { padding: 20px; gap: 16px; }
+    .page-header { margin-bottom: 24px; }
+
+        /* --- Navbar --- */
+    .navbar-inner { padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: nowrap; }
+    .brand { font-size: 1.3rem; flex-shrink: 0; } 
+    .nav-links { gap: 12px; flex-wrap: nowrap; align-items: center; }
+    
+    /* Sembunyiin teks, sisain icon */
+    .nav-text { display: none !important; } 
+    
+    .nav-link-icon, .nav-icon, .btn-settings { padding: 4px; gap: 0; }
+    .btn-settings svg { width: 24px; height: 24px; }
+
+    /* --- Auth (bebasin dari position: fixed) --- */
+    .auth-wrapper {
+        position: static !important;
+        height: auto !important;
+        width: 100% !important;
+        min-height: calc(100vh - 60px);
+        padding: 20px 16px !important;
+        flex-direction: column !important;
+    }
+    .auth-left { display: none !important; }
+    .auth-right { padding: 0 !important; flex: 1; }
+    .auth-box { padding: 24px; max-width: 100%; }
+
+    /* --- Grid --- */
+    .recipe-grid { grid-template-columns: 1fr; gap: 16px; }
+    .user-grid { grid-template-columns: 1fr; gap: 16px; }
+    .recipe-card .card-body { padding: 18px; }
+    .card-body h3 { font-size: 1.2rem; }
+
+    /* --- Filter --- */
+    .filter-bar { padding: 16px; gap: 12px; }
+    .filter-inputs { flex-direction: column; gap: 10px; }
+    .input-search,
+    .search-wrapper,
+    .custom-dropdown,
+    .search-wrapper .input-search { min-width: 0; width: 100%; }
+    .dropdown-btn { padding: 12px 14px; }
+    .filter-checkbox { flex-wrap: wrap; gap: 8px; padding-top: 12px; }
+
+    /* --- Mode switcher --- */
+    .mode-switcher-wrapper { margin-bottom: 20px; }
+    .mode-switcher { flex-wrap: wrap; justify-content: center; gap: 4px; padding: 4px; }
+    .mode-switcher a { padding: 6px 10px; font-size: 0.8rem; }
+    .mode-switcher a svg { width: 12px; height: 12px; }
+
+    /* --- Detail resep --- */
+    .detail-header { flex-direction: column; gap: 16px; }
+    .header-actions { width: 100%; gap: 8px; }
+    .header-actions form { flex: 1; display: flex; }
+    .header-actions form button { width: 100%; }
+    .header-actions > a { flex: 1; justify-content: center; }
+
+    /* --- Interaction bar (rating + like) --- */
+    .interaction-bar { justify-content: stretch; }
+    .interaction-group { width: 100%; justify-content: space-between; padding: 10px 14px; }
+    .star-rating label { font-size: 1.3rem; }
+
+    /* --- Profil --- */
+    .profile-header-card { flex-direction: column; align-items: stretch; padding: 20px; }
+    .profile-actions { width: 100%; }
+    .profile-actions form,
+    .profile-actions .btn-primary,
+    .profile-actions .btn-outline { width: 100%; }
+    .profile-stats { padding: 16px 12px; gap: 12px; justify-content: space-around; }
+    .stat-item strong { font-size: 1.3rem; }
+    .stat-item span { font-size: 0.75rem; }
+
+    /* --- Form row --- */
+    .form-row { flex-direction: column; gap: 16px; }
+    .form-row .flex-1, .form-row .flex-2 { min-width: 0; }
+
+    /* --- Komentar --- */
+    .comment-header { flex-wrap: wrap; gap: 4px; }
+    .comment-item { padding: 12px 14px; }
+    .comment-replies { padding-left: 12px; }
+
+    /* --- Modal --- */
+    .modal-box { width: 92vw !important; max-width: 92vw !important; padding: 20px; }
+    .crop-container { height: 280px; }
+
+    /* --- FAB --- */
+    .fab-button { bottom: 20px; right: 20px; width: 54px; height: 54px; }
+    .fab-button svg { width: 28px; height: 28px; }
+
+    /* --- Admin bug table (nggak muat di HP) --- */
+    .admin-bugs-table { font-size: 0.8rem; }
+    .admin-bugs-table th,
+    .admin-bugs-table td { padding: 8px !important; }
+
+    /* --- Button umum --- */
+    .btn-primary, .btn-outline, .btn-danger,
+    .btn-warning, .btn-success { padding: 10px 18px; font-size: 0.9rem; }
+    .btn-lg { padding: 12px 24px; font-size: 0.95rem; }
 }
