@@ -24,6 +24,9 @@ class Recipe(db.Model):
     # User_id dipakai buat Feed dan Profil
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    rating = db.Column(db.Integer, default=0)
+    catatan = db.Column(db.String(255), default="")
+
 
 class Follow(db.Model):
     __tablename__ = "follows"
