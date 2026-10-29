@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from flask_login import UserMixin
 from core.db import db
 
@@ -10,7 +10,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(255), nullable=False)
     bio = db.Column(db.Text, default="")
     profile_pic = db.Column(db.String(255), default="default_avatar.png")
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
 class Recipe(db.Model):
     __tablename__ = "recipes"
@@ -23,7 +23,7 @@ class Recipe(db.Model):
     langkah = db.Column(db.Text, nullable=False)
     # User_id dipakai buat Feed dan Profil
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     rating = db.Column(db.Integer, default=0)
     catatan = db.Column(db.String(255), default="")
 
@@ -55,7 +55,7 @@ class Comment(db.Model):
     # Sering dipanggil buat nampilin komentar di detail resep
     recipe_id = db.Column(db.Integer, db.ForeignKey("recipes.id"), nullable=False, index=True)
     parent_id = db.Column(db.Integer, db.ForeignKey("comments.id"), nullable=True, index=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
 class CommentReaction(db.Model):
     __tablename__ = "comment_reactions"
@@ -70,7 +70,7 @@ class Notification(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
     message = db.Column(db.Text, nullable=False)
     is_read = db.Column(db.Boolean, default=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
 class BugReport(db.Model):
     __tablename__ = "bug_reports"
@@ -79,4 +79,4 @@ class BugReport(db.Model):
     message = db.Column(db.Text, nullable=False)
     # Admin sering filter berdasarkan status 'pending'
     status = db.Column(db.String(20), default="pending", index=True) 
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
