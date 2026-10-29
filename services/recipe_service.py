@@ -120,4 +120,10 @@ def by_owner(recipes, user_id):
     return [r for r in recipes if r.get("user_id") == user_id]
 
 def is_favorite(recipe_id):
+    from flask_login import current_user # Pastikan ini di-import (biasanya udah di atas file)
+    
+    # Cek dulu, kalau belum login ya balikin False aja
+    if not current_user.is_authenticated:
+        return False
+        
     return Favorite.query.filter_by(user_id=int(current_user.id), recipe_id=recipe_id).first() is not None

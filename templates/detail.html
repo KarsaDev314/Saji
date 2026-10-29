@@ -15,7 +15,8 @@
             {% endif %}
         </div>
         
-        <div class="header-actions">
+                <div class="header-actions">
+            {% if current_user.is_authenticated %}
             <form method="POST" action="{{ url_for('toggle_favorit', resep_id=resep.id) }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <button type="submit" class="btn-outline {% if is_favorit %}aktif{% endif %}" style="display: flex; align-items: center; gap: 6px;">
@@ -24,6 +25,12 @@
                     </svg> Favorit
                 </button>
             </form>
+            {% else %}
+            <a href="{{ url_for('login') }}" class="btn-outline" style="display: flex; align-items: center; gap: 6px; text-decoration: none;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+                Login untuk Favorit
+            </a>
+            {% endif %}
             
             {% if boleh_edit %}
             <a href="{{ url_for('edit', resep_id=resep.id) }}" class="btn-warning" style="display: flex; align-items: center; gap: 6px;">
