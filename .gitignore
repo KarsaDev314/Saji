@@ -13,11 +13,14 @@ saji.db
 # File Upload User (Jangan masuk Git)
 static/uploads/
 
-# Testing
+# Testing (Ignore hasil, TAPI JANGAN ignore file test-nya)
 .pytest_cache/
-test/
-tests/
-conftest.py
+.coverage
+htmlcov/
+
+# Environment Variables (Penting buat SECRET_KEY)
+.env
+.env.*
 
 # File Catatan Internal & Arsip
 ESTAFET_KARSA.md
