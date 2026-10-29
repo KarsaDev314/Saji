@@ -7,7 +7,7 @@ def all():
     return storage.load_users()
 
 def find_by_id(user_id):
-    return User.query.get(int(user_id))
+    return db.session.get(User, int(user_id))
 
 def find_by_username(username):
     return storage.find_by_username(username)
@@ -16,7 +16,7 @@ def find_record_by_id(user_id):
     return storage.find_record_by_id(user_id)
 
 def update_profile(user_id, username, bio, filename=None):
-    u = User.query.get(int(user_id))
+    u = db.session.get(User, int(user_id))
     if u:
         u.username = username
         u.bio = bio

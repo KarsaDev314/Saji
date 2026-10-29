@@ -7,7 +7,7 @@ def all():
     return storage.load_recipes()
 
 def find(recipe_id):
-    r = Recipe.query.get(int(recipe_id))
+    r = db.session.get(Recipe, int(recipe_id))
     if not r: return None
     likes = [l.user_id for l in RecipeLike.query.filter_by(recipe_id=r.id).all()]
     
@@ -15,7 +15,7 @@ def find(recipe_id):
     comments_raw = Comment.query.filter_by(recipe_id=r.id).order_by(Comment.created_at.desc()).all()
     comments = []
     for c in comments_raw:
-        u = User.query.get(c.user_id)
+        u = db.session.get(User, c.user_id)
         comments.append({
             "id": c.id, "user_id": c.user_id, 
             "username": u.username if u else "Unknown",
@@ -43,7 +43,7 @@ def create(data):
     return new_r.id
 
 def update(recipe_id, data):
-    r = Recipe.query.get(int(recipe_id))
+    r = db.session.get(Recipe, int(recipe_id))
     if r:
         r.nama = data['nama']
         r.kategori = data['kategori']
@@ -53,7 +53,7 @@ def update(recipe_id, data):
         db.session.commit()
 
 def delete(recipe_id):
-    r = Recipe.query.get(int(recipe_id))
+    r = db.session.get(Recipe, int(recipe_id))
     if r:
         RecipeLike.query.filter_by(recipe_id=r.id).delete()
         Favorite.query.filter_by(recipe_id=r.id).delete()
@@ -76,7 +76,7 @@ def toggle_like(recipe_id):
         return True # Liked
 
 def set_rating(recipe_id, rating, catatan):
-    r = Recipe.query.get(int(recipe_id))
+    r = db.session.get(Recipe, int(recipe_id))
     if r:
         r.rating = rating
         r.catatan = catatan
@@ -94,7 +94,7 @@ def toggle_favorite(recipe_id):
         return True
 
 def owner_public(recipe):
-    u = User.query.get(recipe.get("user_id"))
+    u = db.session.get(User, recipe.get("user_id"))
     return {"id": u.id, "username": u.username, "bio": u.bio, "profile_pic": u.profile_pic} if u else None
 
 def filter_(recipes, keyword, kategori, only_favorite, favorite_ids):

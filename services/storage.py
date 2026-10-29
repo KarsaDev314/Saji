@@ -18,7 +18,7 @@ def load_users():
     return result
 
 def find_record_by_id(user_id):
-    u = User.query.get(int(user_id))
+    u = db.session.get(User, int(user_id))
     if not u: return None
     following = [f.followed_id for f in Follow.query.filter_by(follower_id=u.id).all()]
     favs = [f.recipe_id for f in Favorite.query.filter_by(user_id=u.id).all()]

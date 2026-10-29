@@ -4,7 +4,7 @@ from flask_login import current_user
 
 def _to_dict(c):
     """Ubah objek Comment jadi dictionary biar dibaca template HTML."""
-    u = User.query.get(c.user_id)
+    u = db.session.get(User, c.user_id)
     return {
         "id": c.id,
         "user_id": c.user_id,
@@ -27,14 +27,14 @@ def add(recipe_id, text, parent_id=None):
     return _to_dict(new_c) # Balikin dalam bentuk dict
 
 def find_comment_by_id(comment_id):
-    return Comment.query.get(int(comment_id))
+    return db.session.get(Comment, int(comment_id))
 
 def find(recipe_id):
     comments = Comment.query.filter_by(recipe_id=int(recipe_id), parent_id=None).order_by(Comment.created_at.desc()).all()
     return [_to_dict(c) for c in comments]
 
 def update_text(recipe_id, comment_id, new_text):
-    c = Comment.query.get(int(comment_id))
+    c = db.session.get(Comment, int(comment_id))
     if c:
         c.text = new_text
         db.session.commit()
@@ -42,7 +42,7 @@ def update_text(recipe_id, comment_id, new_text):
 def delete(recipe_id, comment_id):
     Comment.query.filter_by(parent_id=int(comment_id)).delete()
     CommentReaction.query.filter_by(comment_id=int(comment_id)).delete()
-    c = Comment.query.get(int(comment_id))
+    c = db.session.get(Comment, int(comment_id))
     if c:
         db.session.delete(c)
         db.session.commit()
