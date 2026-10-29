@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template
+from flask import Flask, render_template, send_from_directory
 from flask_login import current_user
 import config
 from extensions import csrf, login_manager, limiter
@@ -79,6 +79,12 @@ def load_user(user_id):
     return find_by_id(user_id)
 
 app = create_app()
+
+@app.route('/sw.js')
+def service_worker():
+    response = send_from_directory('static', 'sw.js')
+    response.headers['Content-Type'] = 'application/javascript'
+    return response
 
 if __name__ == "__main__":
     app.run(debug=config.FLASK_DEBUG, host=config.HOST, port=config.PORT)
