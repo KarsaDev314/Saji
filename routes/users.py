@@ -41,7 +41,11 @@ def register(app):
     @login_required
     def toggle_follow(target_id):
         res = user_service.toggle_follow(target_id)
-        if res: flash(*res)
+        if res:
+            if res.get("status") == "error":
+                flash(res.get("message"), "danger")
+            else:
+                flash("Berhasil memperbarui status mengikuti.", "sukses")
         return redirect(request.referrer or url_for("index"))
 
     # UBAH /pengaturan JADI /settings
