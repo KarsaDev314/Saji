@@ -79,12 +79,19 @@ def register(app):
                 os.makedirs(os.path.dirname(filepath), exist_ok=True)
                 file.save(filepath)
 
-                # Hapus foto lama
+                                # Hapus foto lama
                 old_pic = user_data.get("profile_pic")
                 if old_pic and old_pic != "default_avatar.png":
-                    old_filepath = os.path.join(current_app.root_path, config.UPLOAD_FOLDER, old_pic)
-                    if os.path.exists(old_filepath):
-                        os.remove(old_filepath)
+                    old_filepath = os.path.join(
+                        current_app.root_path, config.UPLOAD_FOLDER, old_pic
+                    )
+                    try:
+                        if os.path.exists(old_filepath):
+                            os.remove(old_filepath)
+                    except OSError as e:
+                        current_app.logger.warning(
+                            f"Gagal hapus foto lama {old_filepath}: {e}"
+                        )
 
             user_service.update_profile(int(current_user.id), username, bio, filename)
             flash("Profil berhasil diperbarui.", "sukses")
