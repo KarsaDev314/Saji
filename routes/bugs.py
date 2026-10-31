@@ -30,7 +30,7 @@ def register(app):
     def resolve_bug(bug_id):
         if current_user.username != config.ADMIN_USERNAME:
             abort(403)
-        report = BugReport.query.get_or_404(bug_id)
+        report = db.get_or_404(BugReport, bug_id)
         report.status = "resolved"
         db.session.commit()
         flash("Laporan bug berhasil ditandai selesai.", "sukses")
