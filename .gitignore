@@ -3,14 +3,14 @@
 venv/
 env/
 __pycache__/
-*.py[cod]           # nangkep .pyc, .pyo, .pyd sekaligus
+*.py[cod]
 *.egg-info/
 build/
 dist/
 
 # Database lokal + file temp SQLite
 saji.db
-saji.db-*           # journal, wal, shm
+saji.db-*
 *.sqlite3
 *.sqlite3-*
 
@@ -31,10 +31,10 @@ htmlcov/
 # File Catatan Internal & Arsip
 ESTAFET_KARSA.md
 ESTAFET_KARSA_v2.md
-ESTAFET_KARSA_v3.md   # siap-siap buat handoff berikutnya
+ESTAFET_KARSA_v3.md
 _archive/
 migrate_pfp.py
-fix_missing_columns.py   # samain perlakuannya
+fix_missing_columns.py
 *.txt
 !requirements.txt
 
