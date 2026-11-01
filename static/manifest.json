@@ -4,9 +4,13 @@
   "description": "Temukan inspirasi masakan, bagikan resep andalanmu, dan terhubung dengan pecinta kuliner.",
   "start_url": "/",
   "scope": "/",
+  "id": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#f0f4f8",
   "theme_color": "#d35400",
+  "lang": "id",
+  "categories": ["food", "lifestyle"],
   "icons": [
     {
       "src": "/static/icons/icon-192.png",
@@ -19,6 +23,20 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/static/screenshots/desktop.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/static/screenshots/mobile.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow"
     }
   ]
 }
