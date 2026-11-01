@@ -25,16 +25,16 @@
       "purpose": "any maskable"
     }
   ],
-  "screenshots": [
+    "screenshots": [
     {
       "src": "/static/screenshots/desktop.png",
-      "sizes": "1920x1080",
+      "sizes": "1919x1079",
       "type": "image/png",
       "form_factor": "wide"
     },
     {
       "src": "/static/screenshots/mobile.png",
-      "sizes": "1080x1920",
+      "sizes": "465x933",
       "type": "image/png",
       "form_factor": "narrow"
     }
