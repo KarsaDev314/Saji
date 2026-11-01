@@ -1,17 +1,43 @@
-const CACHE_NAME = 'saji-cache-v2'; // Naikin versinya biar cache lama kehapus
+const CACHE_NAME = 'saji-cache-v3'; 
+const ASSETS_TO_CACHE = [
+    '/',
+    '/static/style.css',
+    '/static/app.js',
+    '/static/icons/icon-192.png',
+    '/static/icons/icon-512.png'
+];
 
+// 1. Simpan file ke cache saat pertama kali di-install
 self.addEventListener('install', (event) => {
-  self.skipWaiting(); // Paksa SW baru langsung aktif
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(ASSETS_TO_CACHE);
+    })
+  );
+  self.skipWaiting(); 
 });
 
+// 2. Hapus cache versi lama kalau ada update baru
 self.addEventListener('activate', (event) => {
-  event.waitUntil(clients.claim()); // Ambil kendali halaman langsung
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cache) => {
+          if (cache !== CACHE_NAME) {
+            return caches.delete(cache);
+          }
+        })
+      );
+    })
+  );
+  self.clients.claim(); 
 });
 
+// 3. Ambil dari internet, kalau gagal (offline), ambil dari cache
 self.addEventListener('fetch', (event) => {
-  // Biarin lewat aja dulu, nggak usah nge-cache apa-apa
-  // biar nggak ada error file not found
-  event.respondWith(fetch(event.request).catch(() => {
+  event.respondWith(
+    fetch(event.request).catch(() => {
       return caches.match(event.request);
-  }));
+    })
+  );
 });

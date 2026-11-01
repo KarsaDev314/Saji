@@ -31,10 +31,10 @@ htmlcov/
 # File Catatan Internal & Arsip
 ESTAFET_KARSA.md
 ESTAFET_KARSA_v2.md
-ESTAFET_KARSA_v3.md
+ESTAFET_KARSA_v3.md   # siap-siap buat handoff berikutnya
 _archive/
 migrate_pfp.py
-fix_missing_columns.py
+fix_missing_columns.py   # samain perlakuannya
 *.txt
 !requirements.txt
 
